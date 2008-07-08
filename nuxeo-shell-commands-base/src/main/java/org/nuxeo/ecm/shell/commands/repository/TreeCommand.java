@@ -19,19 +19,16 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
-import java.util.List;
-
-import org.nuxeo.ecm.core.client.RepositoryInstance;
-import org.nuxeo.ecm.shell.CommandLine;
-import org.nuxeo.ecm.shell.commands.ColorHelper;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
-import org.nuxeo.ecm.core.api.DocumentModelTree;
 import org.nuxeo.ecm.core.api.DocumentRef;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.shell.CommandLine;
+import org.nuxeo.ecm.shell.commands.ColorHelper;
 
 /**
  * @author <a href="mailto:fsommavilla@nuxeo.com">Fabrice Sommavilla</a>
- * 
+ *
  */
 public class TreeCommand extends AbstractCommand {
 

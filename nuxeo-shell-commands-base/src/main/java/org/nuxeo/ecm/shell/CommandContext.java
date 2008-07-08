@@ -22,11 +22,15 @@ package org.nuxeo.ecm.shell;
 import java.util.HashMap;
 
 import org.nuxeo.common.utils.Path;
-import org.nuxeo.ecm.core.client.NuxeoClient;
-import org.nuxeo.ecm.core.client.RepositoryInstance;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.PathRef;
+import org.nuxeo.ecm.core.api.repository.LocalRepositoryInstanceHandler;
+import org.nuxeo.ecm.core.api.repository.Repository;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.api.repository.RepositoryManager;
+import org.nuxeo.ecm.core.client.NuxeoClient;
+import org.nuxeo.runtime.api.Framework;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
@@ -132,16 +136,34 @@ public class CommandContext extends HashMap<String, Object> {
         return getDocumentByPath(getCurrentDocument(), path);
     }
 
+    /**
+     * Whether the shell is running in the context of a local repository
+     *
+     * @return
+     */
+    public boolean isLocal() {
+        return host == null;
+    }
+
     public RepositoryInstance getRepositoryInstance() throws Exception {
         if (repository == null) {
             String repoName = cmdLine.getOption("repository");
-            if (repoName == null) {
-                repository = NuxeoClient.getInstance().openRepository();
+            if (isLocal()) { // connect to a local repository
+                repository = openLocalRepository(repoName == null ? "default" : repoName);
             } else {
-                repository = NuxeoClient.getInstance().openRepository(repoName);
+                if (repoName == null) {
+                    repository = NuxeoClient.getInstance().openRepository();
+                } else {
+                    repository = NuxeoClient.getInstance().openRepository(repoName);
+                }
             }
         }
         return repository;
+    }
+
+    public RepositoryInstance openLocalRepository(String name) {
+        Repository repository = Framework.getLocalService(RepositoryManager.class).getDefaultRepository();
+        return new LocalRepositoryInstanceHandler(repository, getUsername()).getProxy();
     }
 
     public DocumentModel getDocumentByPath(DocumentRef base, Path path) throws Exception {

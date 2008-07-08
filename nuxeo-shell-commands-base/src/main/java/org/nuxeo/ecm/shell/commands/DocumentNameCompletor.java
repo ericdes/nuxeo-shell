@@ -24,9 +24,9 @@ import java.util.List;
 import jline.Completor;
 
 import org.nuxeo.common.utils.Path;
-import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
+import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.ecm.shell.CommandContext;
 import org.nuxeo.ecm.shell.CommandLineService;
 
@@ -43,7 +43,7 @@ public class DocumentNameCompletor implements Completor {
     }
 
     public int complete(String buf, int off, List candidates) {
-        if (!NuxeoClient.getInstance().isConnected()) {
+        if (!service.getCommandContext().isLocal() && !NuxeoClient.getInstance().isConnected()) {
             try {
                 service.initalizeConnection();
             } catch (Exception e) {

@@ -70,7 +70,7 @@
       class="org.nuxeo.ecm.shell.commands.repository.TreeCommand"
       alt="tree">
       <description>
-        List directory content and subdirectory content (on remote) 
+        List directory content and subdirectory content (on remote)
         reprensented by a tree
       </description>
       <params>
@@ -297,9 +297,9 @@
       The password to use when connecting.
     </option>
 
-    <option name="host" shortcut="h" var="true" value="localhost">
-      The host where to connect to. By default 'localhost' is
-      used.
+    <option name="host" shortcut="h" var="true">
+      The host where to connect to. By default no host is used - this
+      will force a local connection (in VM repository)
     </option>
 
     <option name="port" shortcut="p" var="true" value="62474">

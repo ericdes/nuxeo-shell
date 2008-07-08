@@ -49,7 +49,7 @@ public class Token {
 
     /**
      * for OPTIONs this is the token index for it's value (0 based)
-     * for VALUEs this is the token index for target the option (0 based)
+     * for VALUEs this is the token index for the target option (0 based)
      * for PARAMs this is the index of the parameter in the parameter list (0 based)
      */
     public int info;

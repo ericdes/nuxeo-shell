@@ -62,6 +62,13 @@ public class CommandLine extends ArrayList<Token> {
         return token;
     }
 
+    public Token setCommand(String command) {
+        Token token = new Token(Token.COMMAND, command, size());
+        set(0, token);
+        this.command = command;
+        return token;
+    }
+
     /**
      * @return the isInteractive.
      */
@@ -71,7 +78,7 @@ public class CommandLine extends ArrayList<Token> {
 
     /**
      * Adds a new option as parsed from the command line. This should be called
-     * by preserving the order as in raw command line. The order is usefull for autocompletion
+     * by preserving the order as in raw command line. The order is useful for auto-completion
      * @param arg
      */
     public Token addOption(String name) {

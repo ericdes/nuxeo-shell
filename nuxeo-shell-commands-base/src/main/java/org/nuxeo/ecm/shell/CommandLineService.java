@@ -20,21 +20,31 @@
 package org.nuxeo.ecm.shell;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
+import org.nuxeo.common.Environment;
 import org.nuxeo.ecm.core.client.DefaultLoginHandler;
 import org.nuxeo.ecm.core.client.NuxeoClient;
+import org.nuxeo.osgi.application.StandaloneApplication;
 import org.nuxeo.runtime.model.ComponentContext;
 import org.nuxeo.runtime.model.ComponentInstance;
 import org.nuxeo.runtime.model.ComponentName;
 import org.nuxeo.runtime.model.DefaultComponent;
 import org.nuxeo.runtime.model.Extension;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.FrameworkListener;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  *
  */
-public class CommandLineService extends DefaultComponent {
+public class CommandLineService extends DefaultComponent implements FrameworkListener {
 
     public static final ComponentName NAME = new ComponentName(
             "org.nuxeo.runtime.client.CommandLineService");
@@ -52,10 +62,12 @@ public class CommandLineService extends DefaultComponent {
         options = new Hashtable<String, CommandOption>();
         shortcuts = new Hashtable<String, CommandOption>();
         commandContext = new CommandContext();
+        context.getRuntimeContext().getBundle().getBundleContext().addFrameworkListener(this);
     }
 
     @Override
     public void deactivate(ComponentContext context) throws Exception {
+        context.getRuntimeContext().getBundle().getBundleContext().removeFrameworkListener(this);
         cmds.clear();
         options.clear();
         shortcuts.clear();
@@ -269,19 +281,43 @@ public class CommandLineService extends DefaultComponent {
             client.setLoginHandler(new DefaultLoginHandler(username, password));
         }
         client.connect(host, port);
-
     }
 
     public void runCommand(CommandDescriptor cd, CommandLine cmdLine) throws Exception {
         Command command = (Command)cd.klass.newInstance();
         NuxeoClient client = NuxeoClient.getInstance();
-        if (cd.requireConnection && !client.isConnected()) {
+        if (commandContext.isLocal()) {
+            // TODO: do here the authentication ...
+        } else if (cd.requireConnection && !client.isConnected()) {
             initalizeConnection();
-            command.run(cmdLine);
-        } else {
-            command.run(cmdLine);
         }
+        command.run(cmdLine);
     }
 
-
+    public void frameworkEvent(FrameworkEvent event) {
+        if (event.getType() == FrameworkEvent.STARTED) {
+            Environment env = Environment.getDefault();
+            if (env == null) {
+                System.err.println("Could not start command line service. This service works only with nxshell launcher");
+                return;
+            }
+            String[] args = env.getCommandLineArguments();
+            int k = -1;
+            // search for the "-exec" option
+            for (int i=0; i<args.length; i++) {
+                if (args[i].equals("-console")) {
+                    k = i+1;
+                    break;
+                }
+            }
+            if (k == -1) {
+                return; // do not activate the console
+            }
+            final String[] newArgs = new String[args.length-k];
+            if (newArgs.length > 0) {
+                System.arraycopy(args, k, newArgs, 0, newArgs.length);
+            }
+            StandaloneApplication.setMainTask(new Runnable() { public void run() {Main.main(newArgs);} });
+        }
+    }
 }
