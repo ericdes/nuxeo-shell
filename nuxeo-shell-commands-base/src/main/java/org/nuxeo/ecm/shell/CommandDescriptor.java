@@ -19,6 +19,9 @@
 
 package org.nuxeo.ecm.shell;
 
+import java.io.File;
+
+import org.nuxeo.common.Environment;
 import org.nuxeo.common.utils.StringUtils;
 import org.nuxeo.common.xmap.annotation.XNode;
 import org.nuxeo.common.xmap.annotation.XNodeList;
@@ -31,11 +34,18 @@ import org.nuxeo.common.xmap.annotation.XObject;
 @XObject("command")
 public class CommandDescriptor implements Comparable<CommandDescriptor> {
 
+
+
     @XNode("@name")
     public String name;
 
     @XNode("@class")
     public Class<?> klass;
+
+    @XNode("@script")
+    public String script;
+
+    private org.nuxeo.ecm.shell.commands.repository.ScriptingCommand  scriptCmd;
 
     @XNode("@requireConnection")
     public boolean requireConnection = true;
@@ -93,5 +103,24 @@ public class CommandDescriptor implements Comparable<CommandDescriptor> {
     public int hashCode() {
         return name != null ? name.hashCode() : 0;
     }
+
+    public Command newInstance() throws Exception {
+        if (klass != null) {
+            return (Command)klass.newInstance();
+        } else if (script != null) {
+            if (scriptCmd == null) {
+                File file = null;
+                if (script.startsWith("/")) {
+                    file = new File(script);
+                } else {
+                    file = new File(Environment.getDefault().getHome(), "scripts/"+script);
+                }
+                scriptCmd = new org.nuxeo.ecm.shell.commands.repository.ScriptingCommand(file);
+            }
+            return scriptCmd;
+        }
+        throw new IllegalStateException("Command implementation not defined : "+name);
+    }
+
 
 }

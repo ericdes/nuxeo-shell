@@ -294,7 +294,7 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
     }
 
     public void runCommand(CommandDescriptor cd, CommandLine cmdLine) throws Exception {
-        Command command = (Command)cd.klass.newInstance();
+        Command command = cd.newInstance();
         NuxeoClient client = NuxeoClient.getInstance();
         if (commandContext.isLocal()) {
             // TODO: do here the authentication ...
