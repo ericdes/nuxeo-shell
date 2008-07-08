@@ -2,32 +2,34 @@
 
   <fileSet id="template">
     <directory>src/main/resources</directory>
-    <excludes>
-      <exclude>**/.svn</exclude>
-    </excludes>
   </fileSet>
 
   <artifactSet id="launcher-lib">
-    <import>**</import>
-    <artifacts>
-      <artifact group="log4j" name="log4j" version="1.2.13" />
-    </artifacts>
+    <import>*</import>
     <includes>
-      <artifact name="nuxeo-runtime-osgi" />
-      <artifact name="nuxeo-common" />
-      <artifact group="org.osgi" />
-      <artifact name="commons-logging" />
+      <artifact name="nuxeo-runtime-launcher" />
     </includes>
-    <excludes><!-- WHY osgi depends on ruintime?? -->
-      <artifact name="nuxeo-runtime" />
-    </excludes>
   </artifactSet>
 
   <artifactSet id="bundles">
     <import>*</import>
     <includes>
+      <artifact group="org.nuxeo.ecm.*" />      
+      <artifact group="org.nuxeo.runtime*" />
+      <artifact group="org.nuxeo.common" />
+      <artifact group="org.nuxeo.ecm.*" />
+    </includes>
+    <excludes>
+      <artifact name="nuxeo-runtime-launcher"/>
+    </excludes>
+  </artifactSet>
+
+  <!--artifactSet id="bundles">
+    <import>*</import>
+    <includes>
       <artifact name="nuxeo-runtime" />
       <artifact name="nuxeo-runtime-scripting" />
+      <artifact name="nuxeo-runtime-osgi" />
       <artifact name="nuxeo-core-api" />
       <artifact name="nuxeo-core-schema" />
       <artifact name="nuxeo-core-client" />
@@ -37,26 +39,22 @@
       <artifact name="nuxeo-shell-commands-base" />
       <artifact name="nuxeo-platform-audit-api" />
     </includes>
-  </artifactSet>
+  </artifactSet-->
 
 
-  <artifactSet id="jboss-client-libs">
+  <artifactSet id="third-party-libs">
     <import>*</import>
     <includes>
       <artifact group="jboss" />
       <artifact group="concurrent" />
       <artifact group="jline" />
       <artifact group="dom4j" />
+      <artifact group="org.osgi" />
+      <artifact name="commons-logging" />      
+      <artifact group="log4j" name="log4j" version="1.2.13" />
     </includes>
   </artifactSet>
 
-  <zipEntrySet id="launcher-class">
-    <artifact>org.nuxeo.runtime:nuxeo-runtime-osgi</artifact>
-    <includes>
-      <include>Launcher.class</include>
-      <include>NuxeoRMIClassLoader.class</include>
-    </includes>
-  </zipEntrySet>
 
   <assemble>
     <set>template</set>
@@ -64,19 +62,18 @@
   </assemble>
 
   <assemble>
-    <set>launcher-class</set>
     <set>launcher-lib</set>
+    <outputFile>/</outputFile>
+  </assemble>
+
+  <assemble>
+    <set>third-party-libs</set>
     <outputFile>lib</outputFile>
   </assemble>
 
   <assemble>
-    <set>jboss-client-libs</set>
-    <outputFile>app/lib</outputFile>
-  </assemble>
-
-  <assemble>
     <set>bundles</set>
-    <outputFile>app/bundles</outputFile>
+    <outputFile>bundles</outputFile>
   </assemble>
 
 </assembly>

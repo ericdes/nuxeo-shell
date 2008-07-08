@@ -190,8 +190,18 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         if (args.length == 0) {
             return cmdLine;
         }
-        cmdLine.addCommand(args[0]);
-        for (int i = 1; i < args.length; i++) {
+        // skip any option before command name - these may be used by the launcher
+        int k = 0;
+        for (int i=0; i<args.length; i++) {
+            if (!args[i].startsWith("-")) {
+                break;
+            } else {
+                k++;
+            }
+        }
+        // now parse the remaining arguments
+        cmdLine.addCommand(args[k]);
+        for (int i = k+1; i < args.length; i++) {
             String arg = args[i];
             CommandOption opt;
             if (arg.startsWith("-")) {

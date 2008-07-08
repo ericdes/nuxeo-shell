@@ -92,7 +92,7 @@ public class Main {
 
         try {
             service.runCommand(cd, cmdLine);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             System.exit(2);
         } finally {

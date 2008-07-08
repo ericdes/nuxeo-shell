@@ -93,7 +93,7 @@ public class InteractiveCommand implements Command {
                 return true;
             }
             runCommand(cmdLine);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             System.err.println("Command failed with error:");
             e.printStackTrace();
         }
