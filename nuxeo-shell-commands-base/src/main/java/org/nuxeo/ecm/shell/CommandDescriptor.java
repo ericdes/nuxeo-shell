@@ -28,44 +28,44 @@ package org.nuxeo.ecm.shell;
 public interface CommandDescriptor extends Comparable<CommandDescriptor> {
 
 
-    public boolean isDynamicScript();
+    boolean isDynamicScript();
 
-    public boolean hasOptions();
+    boolean hasOptions();
 
-    public boolean hasArguments();
+    boolean hasArguments();
 
     /**
      * @return the aliases.
      */
-    public String[] getAliases();
+    String[] getAliases();
 
     /**
      * @return the description.
      */
-    public String getDescription();
+    String getDescription();
 
     /**
      * @return the help.
      */
-    public String getHelp();
+    String getHelp();
 
 
     /**
      * @return the name.
      */
-    public String getName();
+    String getName();
 
     /**
      * @return the options.
      */
-    public CommandOption[] getOptions();
+    CommandOption[] getOptions();
 
     /**
      * @return the params.
      */
-    public CommandParameter[] getArguments();
+    CommandParameter[] getArguments();
 
 
-    public Command newInstance() throws Exception;
+    Command newInstance() throws Exception;
 
 }

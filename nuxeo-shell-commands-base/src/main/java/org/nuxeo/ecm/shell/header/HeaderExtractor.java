@@ -30,6 +30,6 @@ import java.text.ParseException;
  */
 public interface HeaderExtractor {
 
-    public CommandHeader extractHeader(Reader reader) throws IOException,  ParseException;
+    CommandHeader extractHeader(Reader reader) throws IOException,  ParseException;
 
 }

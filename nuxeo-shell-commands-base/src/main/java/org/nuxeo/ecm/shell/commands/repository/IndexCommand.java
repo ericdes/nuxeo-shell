@@ -29,7 +29,7 @@ import org.nuxeo.ecm.shell.CommandLine;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public class IndexCommand extends AbstractCommand {
 
