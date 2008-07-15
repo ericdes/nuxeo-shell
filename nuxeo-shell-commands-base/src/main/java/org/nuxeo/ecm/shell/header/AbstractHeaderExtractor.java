@@ -48,7 +48,7 @@ public abstract class AbstractHeaderExtractor implements HeaderExtractor {
                 return null;
             }
             line = line.trim();
-            if (!line.isEmpty()) {
+            if (!isEmpty(line)) {
                 break;
             }
         }
@@ -66,7 +66,7 @@ public abstract class AbstractHeaderExtractor implements HeaderExtractor {
                 return header;
             }
             line = trimLine(line);
-            if (!line.isEmpty()) {
+            if (!isEmpty(line)) {
                 break;
             }
         }
@@ -81,7 +81,7 @@ public abstract class AbstractHeaderExtractor implements HeaderExtractor {
                 return header;
             }
             line = trimLine(line);
-            if (line.isEmpty()) {
+            if (isEmpty(line)) {
                 break;
             }
             // read synopsis line
@@ -96,7 +96,7 @@ public abstract class AbstractHeaderExtractor implements HeaderExtractor {
                 return header;
             }
             line = trimLine(line);
-            if (!line.isEmpty()) {
+            if (!isEmpty(line)) {
                 break;
             }
         }
@@ -108,20 +108,20 @@ public abstract class AbstractHeaderExtractor implements HeaderExtractor {
             line = reader.readLine();
             if (line == null || isHeaderBoundary(line)) {
                 String input = buf.toString().trim();
-                if (!input.isEmpty()) {
+                if (!isEmpty(input)) {
                     header.pattern = CommandPattern.parsePattern(input);
                 }
                 return header;
             }
             line = trimLine(line);
-            if (line.isEmpty()) {
+            if (isEmpty(line)) {
                 break;
             }
             // read synopsis line
             buf.append(line).append(" ");
         }
         String input = buf.toString().trim();
-        if (!input.isEmpty()) {
+        if (!isEmpty(input)) {
             header.pattern = CommandPattern.parsePattern(input);
         }
 
@@ -132,7 +132,7 @@ public abstract class AbstractHeaderExtractor implements HeaderExtractor {
                 return header;
             }
             line = trimLine(line);
-            if (!line.isEmpty()) {
+            if (!isEmpty(line)) {
                 break;
             }
         }
@@ -154,6 +154,10 @@ public abstract class AbstractHeaderExtractor implements HeaderExtractor {
 
     protected String trimLine(String line) {
         return line.trim();
+    }
+
+    protected boolean isEmpty(String line) {
+        return line == null || line.length() == 0;
     }
 
     protected abstract boolean isHeaderBoundary(String line);
