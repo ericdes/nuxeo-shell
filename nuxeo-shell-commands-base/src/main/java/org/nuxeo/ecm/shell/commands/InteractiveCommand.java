@@ -139,7 +139,7 @@ public class InteractiveCommand implements Command {
         } else {
             // show the possbile completions
             for (CommandDescriptor cd : cmds) {
-                System.out.println(cd.name);
+                System.out.println(cd.getName());
             }
             updatePrompt();
             System.out.print(prefix);

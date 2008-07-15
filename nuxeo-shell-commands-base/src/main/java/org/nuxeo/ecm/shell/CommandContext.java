@@ -29,6 +29,7 @@ import org.nuxeo.ecm.core.api.repository.LocalRepositoryInstanceHandler;
 import org.nuxeo.ecm.core.api.repository.Repository;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.api.repository.RepositoryManager;
+import org.nuxeo.ecm.core.client.DefaultLoginHandler;
 import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.runtime.api.Framework;
 
@@ -147,6 +148,13 @@ public class CommandContext extends HashMap<String, Object> {
 
     public RepositoryInstance getRepositoryInstance() throws Exception {
         if (repository == null) {
+            // initialize connection
+            if (isLocal()) {
+                // TODO: do here the authentication ...
+            } else if (!NuxeoClient.getInstance().isConnected()) {
+                initalizeConnection();
+            }
+            // open repository
             String repoName = cmdLine.getOption("repository");
             if (isLocal()) { // connect to a local repository
                 repository = openLocalRepository(repoName == null ? "default" : repoName);
@@ -159,6 +167,17 @@ public class CommandContext extends HashMap<String, Object> {
             }
         }
         return repository;
+    }
+
+    protected void initalizeConnection() throws Exception {
+        NuxeoClient client = NuxeoClient.getInstance();
+        System.out.println("Connecting to nuxeo server at "
+                + host + ':' + port + " as "
+                + (username == null ? "system user" : username));
+        if (username != null && !"system".equals(username)) {
+            client.setLoginHandler(new DefaultLoginHandler(username, password));
+        }
+        client.connect(host, port);
     }
 
     public RepositoryInstance openLocalRepository(String name) {

@@ -19,24 +19,28 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
-import java.beans.SimpleBeanInfo;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Reader;
+import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.script.Bindings;
 import javax.script.Compilable;
 import javax.script.CompiledScript;
-import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
-import javax.script.SimpleScriptContext;
 
+import org.nuxeo.ecm.shell.CommandDescriptor;
 import org.nuxeo.ecm.shell.CommandLine;
+import org.nuxeo.ecm.shell.header.CommandHeader;
+import org.nuxeo.ecm.shell.header.GroovyHeaderExtractor;
+import org.nuxeo.ecm.shell.header.HeaderExtractor;
+import org.nuxeo.ecm.shell.header.PyHeaderExtractor;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
@@ -46,25 +50,35 @@ public class ScriptingCommand extends AbstractCommand {
 
     protected static ScriptEngineManager scriptMgr = new ScriptEngineManager();
 
+    protected static Map<String,HeaderExtractor> extractors= new HashMap<String, HeaderExtractor>();
 
+    static {
+        extractors.put("groovy", new GroovyHeaderExtractor());
+        extractors.put("py", new PyHeaderExtractor());
+    }
+
+    protected CommandDescriptor descriptor; // used to update descriptor when script is modified
     protected CompiledScript script;
     protected File file;
     protected long lastModified = 0;
+    protected CommandHeader header;
 
-    public ScriptingCommand(File file) throws ScriptException {
-        ScriptEngine engine = scriptMgr.getEngineByExtension(getExtension(file));
-        this.script = compileScript(engine, file);
-        this.lastModified = file.lastModified();
+    public ScriptingCommand(CommandDescriptor descriptor, File file) throws ScriptException {
+        this.descriptor = descriptor;
         this.file = file;
+        this.lastModified = file.lastModified();
+        //getScript(); // force script compil
+    }
+
+    public CommandHeader getCommandHeader() throws Exception {
+        getScript();
+        return header;
     }
 
     public void run(CommandLine cmdLine) throws Exception {
-        if (file.lastModified() > lastModified) {
-            ScriptEngine engine = scriptMgr.getEngineByExtension(getExtension(file));
-            this.script = compileScript(engine, file);
-        }
+        getScript(); // force script compil if needed
         Bindings ctx = new SimpleBindings();
-        ctx.put("cmd", cmdLine);
+        ctx.put("cmdLine", cmdLine);
         ctx.put("ctx", context);
         ctx.put("client", client);
         ctx.put("service", cmdService);
@@ -74,6 +88,7 @@ public class ScriptingCommand extends AbstractCommand {
             System.out.flush();
         }
     }
+
 
     public static CompiledScript compileScript(ScriptEngine engine, File file) throws ScriptException {
         if (engine instanceof Compilable) {
@@ -102,4 +117,28 @@ public class ScriptingCommand extends AbstractCommand {
         return "";
     }
 
+
+    /**
+     * @return the script.
+     */
+    public CompiledScript getScript() throws ScriptException, IOException, ParseException {
+        if (file.lastModified() > lastModified) {
+            this.script = null;
+        }
+        if (this.script == null) {
+            String ext = getExtension(file);
+            ScriptEngine engine = scriptMgr.getEngineByExtension(ext);
+            this.script = compileScript(engine, file);
+            HeaderExtractor extractor = extractors.get(ext);
+            if (extractor != null) {
+                FileReader reader = new FileReader(file);
+                try {
+                    this.header = extractor.extractHeader(reader);
+                } finally {
+                  reader.close();
+                }
+            }
+        }
+        return script;
+    }
 }

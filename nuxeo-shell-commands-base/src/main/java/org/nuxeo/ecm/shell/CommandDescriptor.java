@@ -21,45 +21,52 @@ package org.nuxeo.ecm.shell;
 
 import java.io.File;
 
+import javax.script.ScriptException;
+
 import org.nuxeo.common.Environment;
 import org.nuxeo.common.utils.StringUtils;
 import org.nuxeo.common.xmap.annotation.XNode;
 import org.nuxeo.common.xmap.annotation.XNodeList;
 import org.nuxeo.common.xmap.annotation.XObject;
+import org.nuxeo.ecm.shell.header.CommandHeader;
 
 /**
+ * A command descriptor. This describe command arguments and help.
+ * <p>
+ * A command descriptor may be lazy this means when you need to be sure command definition is loaded
+ * we must call {@link #load()} before accessing command definition.
+ * <p>
+ * When instantiating a command using {@link #newInstance()} the definition
+ * will be automatically loaded if needed.
+ * <p>
+ * Laziness avoid compiling script commands at startup.
+ *
+ * TODO: support for "bundle:" scripts
+ *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  *
  */
 @XObject("command")
 public class CommandDescriptor implements Comparable<CommandDescriptor> {
 
-
-
     @XNode("@name")
-    public String name;
+    protected String name;
 
     @XNode("@class")
-    public Class<?> klass;
+    protected Class<?> klass;
 
     @XNode("@script")
-    public String script;
+    protected String script;
 
     private org.nuxeo.ecm.shell.commands.repository.ScriptingCommand  scriptCmd;
 
-    @XNode("@requireConnection")
-    public boolean requireConnection = true;
-
-    @XNode("@interactive")
-    public boolean isInteractive = false;
-
-    public String[] aliases;
+    protected String[] aliases;
 
     @XNode("description")
-    public String description;
+    protected String description = "N/A";
 
     @XNode("help")
-    public String help;
+    protected String help = "N/A";
 
     @XNodeList(value="options/option", type=CommandOption[].class,
             componentType=CommandOption.class)
@@ -68,6 +75,31 @@ public class CommandDescriptor implements Comparable<CommandDescriptor> {
     @XNodeList(value="params/param", type=CommandParameter[].class,
             componentType=CommandParameter.class)
     public CommandParameter[] params;
+
+
+    /**
+     *
+     */
+    public CommandDescriptor() {
+        // TODO Auto-generated constructor stub
+    }
+
+    public CommandDescriptor(String name, Class<?> klass) {
+        this.name = name;
+        this.klass = klass;
+    }
+
+    public CommandDescriptor(String name, String script) {
+        this.name = name;
+        this.script = script;
+    }
+
+    public boolean isDynamicScript() {
+        if (script != null && !script.startsWith("bundle:")) {
+            return true;
+        }
+        return false;
+    }
 
     @Override
     public String toString() {
@@ -80,6 +112,90 @@ public class CommandDescriptor implements Comparable<CommandDescriptor> {
     @XNode("@alt")
     void setAlt(String alt) {
         aliases = StringUtils.split(alt, ',', true);
+    }
+
+    /**
+     * @return the aliases.
+     */
+    public String[] getAliases() {
+        return aliases;
+    }
+
+    /**
+     * @return the description.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * @return the help.
+     */
+    public String getHelp() {
+        return help;
+    }
+
+    /**
+     * @return the name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return the options.
+     */
+    public CommandOption[] getOptions() {
+        return options;
+    }
+
+    /**
+     * @return the params.
+     */
+    public CommandParameter[] getParams() {
+        return params;
+    }
+
+    /**
+     * @return the script.
+     */
+    public String getScript() {
+        return script;
+    }
+
+    /**
+     * @param params the params to set.
+     */
+    public void setParams(CommandParameter[] params) {
+        this.params = params;
+    }
+
+    /**
+     * @param help the help to set.
+     */
+    public void setHelp(String help) {
+        this.help = help;
+    }
+
+    /**
+     * @param description the description to set.
+     */
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    /**
+     * @param aliases the aliases to set.
+     */
+    public void setAliases(String[] aliases) {
+        this.aliases = aliases;
+    }
+
+    /**
+     * @param options the options to set.
+     */
+    public void setOptions(CommandOption[] options) {
+        this.options = options;
     }
 
     public int compareTo(CommandDescriptor o) {
@@ -108,19 +224,28 @@ public class CommandDescriptor implements Comparable<CommandDescriptor> {
         if (klass != null) {
             return (Command)klass.newInstance();
         } else if (script != null) {
-            if (scriptCmd == null) {
-                File file = null;
-                if (script.startsWith("/")) {
-                    file = new File(script);
-                } else {
-                    file = new File(Environment.getDefault().getHome(), "scripts/"+script);
-                }
-                scriptCmd = new org.nuxeo.ecm.shell.commands.repository.ScriptingCommand(file);
-            }
             return scriptCmd;
         }
         throw new IllegalStateException("Command implementation not defined : "+name);
     }
 
+
+    protected void compileScript() throws ScriptException {
+        File file = null;
+        if (script.startsWith("/")) {
+            file = new File(script);
+        } else if (script.startsWith("bundle:")) { // inside a JAR
+            throw new UnsupportedOperationException("Bundle script references like "+script+" are not yet supported");
+        } else {
+            file = new File(Environment.getDefault().getHome(), "scripts/"+script);
+        }
+        scriptCmd = new org.nuxeo.ecm.shell.commands.repository.ScriptingCommand(this, file);
+    }
+
+
+    protected void importCommandHeader(CommandHeader header) {
+        this.description = header.description;
+        this.help = header.help;
+    }
 
 }

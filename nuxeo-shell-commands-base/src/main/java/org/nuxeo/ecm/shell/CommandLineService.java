@@ -19,6 +19,7 @@
 
 package org.nuxeo.ecm.shell;
 
+import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,14 +30,12 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.nuxeo.common.Environment;
-import org.nuxeo.ecm.core.client.DefaultLoginHandler;
-import org.nuxeo.ecm.core.client.NuxeoClient;
+import org.nuxeo.common.utils.FileUtils;
 import org.nuxeo.osgi.application.StandaloneApplication;
 import org.nuxeo.runtime.model.ComponentContext;
 import org.nuxeo.runtime.model.ComponentInstance;
 import org.nuxeo.runtime.model.ComponentName;
 import org.nuxeo.runtime.model.DefaultComponent;
-import org.nuxeo.runtime.model.Extension;
 import org.osgi.framework.FrameworkEvent;
 import org.osgi.framework.FrameworkListener;
 
@@ -63,6 +62,28 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         shortcuts = new Hashtable<String, CommandOption>();
         commandContext = new CommandContext();
         context.getRuntimeContext().getBundle().getBundleContext().addFrameworkListener(this);
+
+        // register activate script commands
+        reload();
+    }
+
+    /**
+     * Reload script commands
+     */
+    public void reload() {
+        File home = Environment.getDefault().getHome();
+        if (home == null) {
+            home = new File(".");
+        }
+        File scriptsDir = new File(home, "scripts");
+        if (scriptsDir.isDirectory()) {
+            for (File file : scriptsDir.listFiles()) {
+                String script = file.getName();
+                CommandDescriptor cmd = new CommandDescriptor(FileUtils.getFileNameNoExt(script), script);
+                cmd.setDescription("N/A - I am a lazy script command.");
+                cmds.put(cmd.name, cmd);
+            }
+        }
     }
 
     @Override
@@ -76,11 +97,6 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         shortcuts = null;
         commandContext = null;
         //System.out.println("Exiting");
-    }
-
-    @Override
-    public void registerExtension(Extension extension) throws Exception {
-        super.registerExtension(extension);
     }
 
     @Override
@@ -201,6 +217,14 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         }
         // now parse the remaining arguments
         cmdLine.addCommand(args[k]);
+        // if this is a dynamic script command we disable "validate" because
+        // scripts may not declare the metadata() function that describe the command
+        if (validate) {
+            CommandDescriptor cmd = getCommand(cmdLine.getCommand());
+            if (cmd != null && cmd.isDynamicScript()) {
+                validate = false;
+            }
+        }
         for (int i = k+1; i < args.length; i++) {
             String arg = args[i];
             CommandOption opt;
@@ -278,29 +302,8 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
 
     }
 
-    public void initalizeConnection() throws Exception {
-        NuxeoClient client = NuxeoClient.getInstance();
-        String host = commandContext.getHost();
-        int port = commandContext.getPort();
-        String username = commandContext.getUsername();
-        String password = commandContext.getPassword();
-        System.out.println("Connecting to nuxeo server at "
-                + host + ':' + port + " as "
-                + (username == null ? "system user" : username));
-        if (username != null && !"system".equals(username)) {
-            client.setLoginHandler(new DefaultLoginHandler(username, password));
-        }
-        client.connect(host, port);
-    }
-
     public void runCommand(CommandDescriptor cd, CommandLine cmdLine) throws Exception {
         Command command = cd.newInstance();
-        NuxeoClient client = NuxeoClient.getInstance();
-        if (commandContext.isLocal()) {
-            // TODO: do here the authentication ...
-        } else if (cd.requireConnection && !client.isConnected()) {
-            initalizeConnection();
-        }
         command.run(cmdLine);
     }
 

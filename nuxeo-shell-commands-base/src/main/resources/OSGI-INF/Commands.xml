@@ -36,6 +36,12 @@
       <description>The Help</description>
       <help />
     </command>
+    <command name="reload"
+      class="org.nuxeo.ecm.shell.commands.ReloadCommand"
+      requireConnection="false" alt="r">
+      <description>Reload command scripts</description>
+      <help />
+    </command>
     <command name="interactive"
       class="org.nuxeo.ecm.shell.commands.InteractiveCommand"
       requireConnection="false" alt="i,int">

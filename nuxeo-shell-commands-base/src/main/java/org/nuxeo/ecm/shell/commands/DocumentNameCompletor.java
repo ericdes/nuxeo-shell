@@ -43,15 +43,6 @@ public class DocumentNameCompletor implements Completor {
     }
 
     public int complete(String buf, int off, List candidates) {
-        if (!service.getCommandContext().isLocal() && !NuxeoClient.getInstance().isConnected()) {
-            try {
-                service.initalizeConnection();
-            } catch (Exception e) {
-                System.err.println("Failed to connect to nuxeo server");
-                return -1;
-            }
-        }
-
         if (buf == null) {
             buf = "";
         }

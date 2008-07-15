@@ -60,8 +60,8 @@ public class HelpCommand implements Command {
         out.println();
         out.println("The following commands are supported:");
         for (CommandDescriptor cd : service.getSortedCommands()) {
-            out.println(" * " + cd.name + " - "
-                    + (cd.description == null ? "N/A" : cd.description));
+            out.println(" * " + cd.getName() + " - "
+                    + cd.getDescription());
         }
         out.println();
         out.println("Global options: ");
@@ -86,24 +86,31 @@ public class HelpCommand implements Command {
 
     public void printCommandHelp(String cmd, PrintStream out) {
         CommandDescriptor cd = service.getCommand(cmd);
+        try {
+            cd.newInstance(); // make sure command definition is loaded
+        } catch (Exception  e) {
+            // do nothing
+        }
         if (cd == null) {
             System.err.println("Unknown command: "+cmd);
             return;
         }
         // header
-        out.println("Command: "+cd.name+" - "+cd.description);
+        out.println("Command: "+cd.getName()+" - "+cd.getDescription());
         out.println();
         // aliases
         out.print("Aliases: ");
-        if (cd.aliases == null || cd.aliases.length == 0) {
+        String[] aliases = cd.getAliases();
+        if (aliases == null || aliases.length == 0) {
             out.println("N/A");
         } else {
-           out.println(StringUtils.join(cd.aliases, ", "));
+           out.println(StringUtils.join(aliases, ", "));
         }
         out.println();
         // options
         out.println("Options: ");
-        if (cd.options == null || cd.options.length == 0) {
+        CommandOption[] options = cd.getOptions();
+        if (options == null || options.length == 0) {
             out.println("N/A");
         } else {
             for (CommandOption opt : cd.options) {
@@ -120,11 +127,7 @@ public class HelpCommand implements Command {
         }
         out.println();
         // help content
-        if (cd.help == null || cd.help.length() == 0) {
-          out.println("Help not available");
-        } else {
-            printHelp(out, cd.help, "");
-        }
+        printHelp(out, cd.getHelp(), "");
         out.println();
     }
 
