@@ -191,7 +191,7 @@ public class ScriptingCommandDescriptor implements CommandDescriptor {
                         }
                         if (header.pattern == null) {
                             header.pattern = new CommandPattern();
-                            header.pattern.name = getName();
+                            header.pattern.names = new String[] {getName()};
                         }
                     }
                 } finally {

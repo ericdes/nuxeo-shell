@@ -25,12 +25,13 @@ package org.nuxeo.ecm.shell.header;
  */
 public class CommandArgument {
 
+    public String name;
     public String type;
     public boolean isOptional;
 
     @Override
     public String toString() {
-        return isOptional ? "[" +type+"]" : type;
+        return isOptional ? "[" +name+":"+type+"]" : type;
     }
 
 }

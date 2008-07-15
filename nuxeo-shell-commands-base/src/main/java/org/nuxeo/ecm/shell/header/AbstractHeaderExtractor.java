@@ -40,48 +40,116 @@ public abstract class AbstractHeaderExtractor implements HeaderExtractor {
         } else {
             reader = new BufferedReader(r);
         }
-        CommandHeader header = null;
-        String line = reader.readLine();
-        StringBuilder buf = null;
-        while (line != null) {
+
+        String line = null;
+        while (true) {
+            line = reader.readLine();
+            if (line == null) {
+                return null;
+            }
+            line = line.trim();
+            if (!line.isEmpty()) {
+                break;
+            }
+        }
+
+        // test if a header was found
+        if (!isHeaderBoundary(line)) {
+            return null;
+        }
+        CommandHeader header = new CommandHeader();
+
+        // skip empty lines
+        while (true) {
+            line = reader.readLine();
+            if (line == null) {
+                return header;
+            }
+            line = trimLine(line);
+            if (!line.isEmpty()) {
+                break;
+            }
+        }
+
+        StringBuilder buf = new StringBuilder();
+        // find synopsis
+        buf.append(line);
+        while (true) {
+            line = reader.readLine();
+            if (line == null || isHeaderBoundary(line)) {
+                header.description = buf.toString();
+                return header;
+            }
             line = trimLine(line);
             if (line.isEmpty()) {
-                if (buf != null) {
-                    buf.append(CRLF);
-                } else {
-                    line = reader.readLine();
-                    continue;
-                }
+                break;
             }
-            if (isHeaderBoundary(line)) {
-                if (header == null) {
-                    header = new CommandHeader();
-                } else {
-                    if (buf != null) {
-                        header.help = buf.toString();
-                    } else {
-                        header.help = "N/A";
-                    }
-                    return header;
-                }
-            } else {
-                if (header == null) {
-                    return null;
-                }
-                if (header.description == null) {
-                    header.description = line;
-                } else if (header.pattern == null) {
-                    header.pattern = CommandPattern.parsePattern(line);
-                } else {
-                    if (buf == null) {
-                        buf = new StringBuilder();
-                    }
-                    buf.append(line).append(CRLF);
-                }
-            }
-            line = reader.readLine();
+            // read synopsis line
+            buf.append(" ").append(line);
         }
-        return header;
+        header.description = buf.toString();
+
+        // skip empty lines
+        while (true) {
+            line = reader.readLine();
+            if (line == null) {
+                return header;
+            }
+            line = trimLine(line);
+            if (!line.isEmpty()) {
+                break;
+            }
+        }
+
+        buf.setLength(0);
+        buf.append(line);
+        // find syntax
+        while (true) {
+            line = reader.readLine();
+            if (line == null || isHeaderBoundary(line)) {
+                String input = buf.toString().trim();
+                if (!input.isEmpty()) {
+                    header.pattern = CommandPattern.parsePattern(input);
+                }
+                return header;
+            }
+            line = trimLine(line);
+            if (line.isEmpty()) {
+                break;
+            }
+            // read synopsis line
+            buf.append(line).append(" ");
+        }
+        String input = buf.toString().trim();
+        if (!input.isEmpty()) {
+            header.pattern = CommandPattern.parsePattern(input);
+        }
+
+        // skip empty lines
+        while (true) {
+            line = reader.readLine();
+            if (line == null) {
+                return header;
+            }
+            line = trimLine(line);
+            if (!line.isEmpty()) {
+                break;
+            }
+        }
+
+        buf.setLength(0);
+        buf.append(line);
+        // find help
+        while (true) {
+            line = reader.readLine();
+            if (line == null || isHeaderBoundary(line)) {
+                header.help = buf.toString().trim();
+                return header;
+            }
+            line = trimLine(line);
+            // read synopsis line
+            buf.append(line).append(CRLF);
+        }
     }
 
     protected String trimLine(String line) {

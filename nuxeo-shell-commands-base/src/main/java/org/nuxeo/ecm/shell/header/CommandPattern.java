@@ -36,14 +36,14 @@ import org.nuxeo.common.utils.StringUtils;
  */
 public class CommandPattern {
 
-    public String name;
+    public String[] names;
     public List<CommandOption> options = new ArrayList<CommandOption>();
     public List<CommandArgument> args = new ArrayList<CommandArgument>();
 
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append(name).append(" ");
+        buf.append(StringUtils.join(names, '|')).append(" ");
         for (CommandOption opt : options) {
             buf.append(opt.toString()).append(" ");
         }
@@ -81,8 +81,8 @@ public class CommandPattern {
                     cmd.options.add(opt);
                 } else {
                     arg = new CommandArgument();
-                    arg.type = buf.toString();
                     arg.isOptional = true;
+                    initCommandArgument(arg, buf.toString());
                     cmd.args.add(arg);
                 }
                 break;
@@ -94,11 +94,12 @@ public class CommandPattern {
                 break;
             default:
                 i = collectUntil(' ', buf, input, i);
-                if (cmd.name == null) {
-                    cmd.name = buf.toString();
+                if (cmd.names == null) {
+                    String names = buf.toString();
+                    cmd.names = StringUtils.split(names, '|', false);
                 } else {
                     arg = new CommandArgument();
-                    arg.type = buf.toString();
+                    initCommandArgument(arg, buf.toString());
                     cmd.args.add(arg);
                 }
                 break;
@@ -106,6 +107,17 @@ public class CommandPattern {
             buf.setLength(0);
         }
         return cmd;
+    }
+
+    private static void initCommandArgument(CommandArgument arg, String value) {
+        int p = value.indexOf(':');
+        if (p > 0) {
+            arg.type = value.substring(p+1);
+            arg.name = value.substring(0, p);
+        } else {
+            arg.type = "string";
+            arg.name = value;
+        }
     }
 
     public static int collectUntil(char sep, StringBuilder buf, String input, int offset) {
@@ -140,10 +152,16 @@ public class CommandPattern {
 
 
     public static void main(String[] args) throws Exception {
-        String input = "cp [--recurse|-r] [--depth|-d:int?1] [--version|-v] file [doc]";
+        String input = "cp|copy [--recurse|-r] [--depth|-d:int?1] [--version|-v] file [destination:doc]";
         System.out.println(input);
         CommandPattern cmd = parsePattern(input);
         System.out.println(cmd);
+
+        input = "cp|copy [--recurse|-r] [--depth|-d:int?1] [--version|-v] file [destination]";
+        System.out.println(input);
+        cmd = parsePattern(input);
+        System.out.println(cmd);
+
     }
 
 }
