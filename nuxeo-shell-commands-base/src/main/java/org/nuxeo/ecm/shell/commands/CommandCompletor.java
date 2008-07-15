@@ -19,6 +19,8 @@
 
 package org.nuxeo.ecm.shell.commands;
 
+import java.util.List;
+
 import org.nuxeo.ecm.shell.CommandLineService;
 
 /**
@@ -27,8 +29,17 @@ import org.nuxeo.ecm.shell.CommandLineService;
  */
 public class CommandCompletor extends jline.SimpleCompletor {
 
+    CommandLineService svc;
+
     public CommandCompletor(CommandLineService service) {
         super (service.getCommandNames());
+        svc = service;
+    }
+
+    @Override
+    public int complete(String buffer, int cursor, List clist) {
+        setCandidateStrings(svc.getCommandNames());
+        return super.complete(buffer, cursor, clist);
     }
 
 }

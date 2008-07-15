@@ -19,16 +19,29 @@
 
 package org.nuxeo.ecm.shell.header;
 
+import org.nuxeo.common.utils.StringUtils;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  *
  */
-public class CommandHeader {
+public class CommandOption {
 
-    public String description = null;
-    public String help = null;
-    public CommandPattern pattern;
+    public String[] names;
+    public String type;
+    public boolean isRequired;
+    public String defaultValue;
 
+    @Override
+    public String toString() {
+        String str = StringUtils.join(names, '|');
+        if (type != null) {
+            str += ":" + type;
+        }
+        if (defaultValue != null) {
+            str += "?" + defaultValue;
+        }
+        return !isRequired ? "[" +str+"]" : str;
+    }
 
 }

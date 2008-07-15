@@ -37,55 +37,29 @@ import org.nuxeo.common.utils.StringUtils;
 public class CommandPattern {
 
     public String name;
-    public List<Option> options = new ArrayList<Option>();
-    public List<Argument> args = new ArrayList<Argument>();
+    public List<CommandOption> options = new ArrayList<CommandOption>();
+    public List<CommandArgument> args = new ArrayList<CommandArgument>();
 
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append(name).append(" ");
-        for (Option opt : options) {
+        for (CommandOption opt : options) {
             buf.append(opt.toString()).append(" ");
         }
-        for (Argument arg : args) {
+        for (CommandArgument arg : args) {
             buf.append(arg.toString()).append(" ");
         }
         return buf.toString();
     }
 
-    public static class Argument {
-        String type;
-        boolean isOptional;
-        @Override
-        public String toString() {
-            return isOptional ? "[" +type+"]" : type;
-        }
-    }
-
-    public static class Option {
-        public String[] names;
-        public String type;
-        public boolean isRequired;
-        public String defaultValue;
-        @Override
-        public String toString() {
-            String str = StringUtils.join(names, '|');
-            if (type != null) {
-                str += ":" + type;
-            }
-            if (defaultValue != null) {
-                str += "?" + defaultValue;
-            }
-            return !isRequired ? "[" +str+"]" : str;
-        }
-    }
 
     public static CommandPattern parsePattern(String input) throws ParseException {
         CommandPattern cmd = new CommandPattern();
         int len = input.length();
         StringBuilder buf = new StringBuilder();
-        Option opt = null;
-        Argument arg = null;
+        CommandOption opt = null;
+        CommandArgument arg = null;
         for (int i=0; i<len; i++) {
             char c = input.charAt(i);
             switch (c) {
@@ -106,7 +80,7 @@ public class CommandPattern {
                     opt.isRequired = false;
                     cmd.options.add(opt);
                 } else {
-                    arg = new Argument();
+                    arg = new CommandArgument();
                     arg.type = buf.toString();
                     arg.isOptional = true;
                     cmd.args.add(arg);
@@ -123,7 +97,7 @@ public class CommandPattern {
                 if (cmd.name == null) {
                     cmd.name = buf.toString();
                 } else {
-                    arg = new Argument();
+                    arg = new CommandArgument();
                     arg.type = buf.toString();
                     cmd.args.add(arg);
                 }
@@ -147,8 +121,8 @@ public class CommandPattern {
         return len;
     }
 
-    private static Option parseOption(String input) {
-        Option opt = new Option();
+    private static CommandOption parseOption(String input) {
+        CommandOption opt = new CommandOption();
         int p = input.indexOf(':');
         if (p > -1) {
             opt.names = StringUtils.split(input.substring(0, p), '|', true);

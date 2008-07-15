@@ -16,7 +16,7 @@
     <documentation>
   Register commands
     </documentation>
-    <object class="org.nuxeo.ecm.shell.CommandDescriptor"/>
+    <object class="org.nuxeo.ecm.shell.DefaultCommandDescriptor"/>
   </extension-point>
 
   <extension-point name="options">

@@ -109,11 +109,10 @@ public class HelpCommand implements Command {
         out.println();
         // options
         out.println("Options: ");
-        CommandOption[] options = cd.getOptions();
-        if (options == null || options.length == 0) {
+        if (!cd.hasOptions()) {
             out.println("N/A");
         } else {
-            for (CommandOption opt : cd.options) {
+            for (CommandOption opt : cd.getOptions()) {
                 String help = opt.getHelp();
                 if (help !=null && help.length() > 0) {
                     String msg = "  --" + opt.getName();

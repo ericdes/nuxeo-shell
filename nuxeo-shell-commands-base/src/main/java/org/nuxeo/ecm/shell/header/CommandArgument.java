@@ -19,16 +19,18 @@
 
 package org.nuxeo.ecm.shell.header;
 
-
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  *
  */
-public class CommandHeader {
+public class CommandArgument {
 
-    public String description = null;
-    public String help = null;
-    public CommandPattern pattern;
+    public String type;
+    public boolean isOptional;
 
+    @Override
+    public String toString() {
+        return isOptional ? "[" +type+"]" : type;
+    }
 
 }

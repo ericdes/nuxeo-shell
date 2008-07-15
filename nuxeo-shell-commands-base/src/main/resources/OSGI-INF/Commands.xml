@@ -35,6 +35,9 @@
       requireConnection="false" alt="h">
       <description>The Help</description>
       <help />
+      <params>
+        <param index="0" type="cmd" />
+      </params>
     </command>
     <command name="reload"
       class="org.nuxeo.ecm.shell.commands.ReloadCommand"

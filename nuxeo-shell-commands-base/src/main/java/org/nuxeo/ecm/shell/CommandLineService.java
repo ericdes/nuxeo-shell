@@ -30,7 +30,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.nuxeo.common.Environment;
-import org.nuxeo.common.utils.FileUtils;
+import org.nuxeo.ecm.shell.commands.scripting.ScriptingCommandDescriptor;
 import org.nuxeo.osgi.application.StandaloneApplication;
 import org.nuxeo.runtime.model.ComponentContext;
 import org.nuxeo.runtime.model.ComponentInstance;
@@ -78,10 +78,8 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         File scriptsDir = new File(home, "scripts");
         if (scriptsDir.isDirectory()) {
             for (File file : scriptsDir.listFiles()) {
-                String script = file.getName();
-                CommandDescriptor cmd = new CommandDescriptor(FileUtils.getFileNameNoExt(script), script);
-                cmd.setDescription("N/A - I am a lazy script command.");
-                cmds.put(cmd.name, cmd);
+                CommandDescriptor cmd = new ScriptingCommandDescriptor(file);
+                cmds.put(cmd.getName(), cmd);
             }
         }
     }
@@ -104,11 +102,12 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
             String extensionPoint, ComponentInstance contributor) {
         if (extensionPoint.equals("commands")) {
             CommandDescriptor cmd = (CommandDescriptor)contribution;
-            cmds.put(cmd.name, cmd);
-            CommandOption[] opts = cmd.options;
+            String name = cmd.getName();
+            cmds.put(name, cmd);
+            CommandOption[] opts = cmd.getOptions();
             if (opts != null) { // register local options
                 for (CommandOption opt : opts) {
-                    opt.setCommand(cmd.name);
+                    opt.setCommand(name);
                     addCommandOption(opt);
                 }
             }
@@ -123,8 +122,8 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
             String extensionPoint, ComponentInstance contributor) {
         if (extensionPoint.equals("commands")) {
             CommandDescriptor cmd = (CommandDescriptor)contribution;
-            cmds.remove(cmd.name);
-            CommandOption[] opts = cmd.options;
+            cmds.remove(cmd.getName());
+            CommandOption[] opts = cmd.getOptions();
             if (opts != null) { // unregister local options
                 for (CommandOption opt : opts) {
                     removeCommandOption(opt);
@@ -141,7 +140,7 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
     }
 
     public void addCommand(CommandDescriptor cmd) {
-        cmds.put(cmd.name, cmd);
+        cmds.put(cmd.getName(), cmd);
     }
 
     public void removeCommand(String name) {
@@ -165,7 +164,7 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
     public CommandDescriptor[] getMatchingCommands(String prefix) {
         List<CommandDescriptor> result = new ArrayList<CommandDescriptor>();
         for (CommandDescriptor cmd : cmds.values()) {
-            if (cmd.name.startsWith(prefix)) {
+            if (cmd.getName().startsWith(prefix)) {
                 result.add(cmd);
             }
         }
