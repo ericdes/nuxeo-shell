@@ -207,8 +207,8 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         }
         // skip any option before command name - these may be used by the launcher
         int k = 0;
-        for (int i=0; i<args.length; i++) {
-            if (!args[i].startsWith("-")) {
+        for (String arg : args) {
+            if (!arg.startsWith("-")) {
                 break;
             } else {
                 k++;

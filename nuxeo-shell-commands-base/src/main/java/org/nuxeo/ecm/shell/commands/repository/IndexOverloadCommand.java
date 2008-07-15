@@ -31,7 +31,7 @@ public class IndexOverloadCommand extends AbstractCommand {
 
     private void printHelp() {
         System.out.println("");
-        System.out.println("Synthax: indexOverLoad doc_path nb [batch_size]");
+        System.out.println("Syntax: indexOverLoad doc_path nb [batch_size]");
         System.out.println(" doc_path path of the doc to index");
         System.out.println(" nb number of concurrent indexing job to start");
         System.out.println(" size of indexing batch");

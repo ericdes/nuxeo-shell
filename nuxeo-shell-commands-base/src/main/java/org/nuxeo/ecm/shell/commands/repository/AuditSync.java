@@ -29,7 +29,7 @@ public class AuditSync extends AbstractCommand {
 
     private void printHelp() {
         System.out.println("");
-        System.out.println("Synthax: auditsync remote_path [clientResursionLevel] ");
+        System.out.println("Syntax: auditsync remote_path [clientResursionLevel] ");
         System.out.println(" remote_path : document path from where audit sync must be launched");
         System.out.println(" subTrans (optionnal, default=0): defines what part of the recursion is done on the client side");
         System.out.println("  (usefull for big DB to avoid EJB3 socket timeout)");

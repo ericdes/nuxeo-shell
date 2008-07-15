@@ -48,18 +48,18 @@ import org.nuxeo.ecm.shell.header.PyHeaderExtractor;
  */
 public class ScriptingCommand extends AbstractCommand {
 
-    protected static ScriptEngineManager scriptMgr = new ScriptEngineManager();
+    protected static final ScriptEngineManager scriptMgr = new ScriptEngineManager();
 
-    protected static Map<String,HeaderExtractor> extractors= new HashMap<String, HeaderExtractor>();
+    protected static final Map<String,HeaderExtractor> extractors= new HashMap<String, HeaderExtractor>();
 
     static {
         extractors.put("groovy", new GroovyHeaderExtractor());
         extractors.put("py", new PyHeaderExtractor());
     }
 
-    protected CommandDescriptor descriptor; // used to update descriptor when script is modified
+    protected final CommandDescriptor descriptor; // used to update descriptor when script is modified
     protected CompiledScript script;
-    protected File file;
+    protected final File file;
     protected long lastModified = 0;
     protected CommandHeader header;
 

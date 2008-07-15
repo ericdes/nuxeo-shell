@@ -37,8 +37,8 @@ import org.nuxeo.common.utils.StringUtils;
 public class CommandPattern {
 
     public String[] names;
-    public List<CommandOption> options = new ArrayList<CommandOption>();
-    public List<CommandArgument> args = new ArrayList<CommandArgument>();
+    public final List<CommandOption> options = new ArrayList<CommandOption>();
+    public final List<CommandArgument> args = new ArrayList<CommandArgument>();
 
     @Override
     public String toString() {

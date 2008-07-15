@@ -49,7 +49,8 @@ import org.nuxeo.ecm.shell.header.PyHeaderExtractor;
  */
 public class ScriptingCommandDescriptor implements CommandDescriptor {
 
-    protected static Map<String,HeaderExtractor> extractors= new HashMap<String, HeaderExtractor>();
+    protected static final Map<String,HeaderExtractor> extractors = new HashMap<String, HeaderExtractor>();
+
     static {
         extractors.put("groovy", new GroovyHeaderExtractor());
         extractors.put("py", new PyHeaderExtractor());
@@ -57,8 +58,8 @@ public class ScriptingCommandDescriptor implements CommandDescriptor {
 
     protected CommandHeader header;
 
-    protected String name;
-    protected File file;
+    protected final String name;
+    protected final File file;
     protected long lastModified = 0;
     protected ScriptingCommand cmd;
 
@@ -121,13 +122,17 @@ public class ScriptingCommandDescriptor implements CommandDescriptor {
 
     public String getDescription() {
         load();
-        if (header == null) return "N/A";
+        if (header == null) {
+            return "N/A";
+        }
         return header.description;
     }
 
     public String getHelp() {
         load();
-        if (header == null) return "N/A";
+        if (header == null) {
+            return "N/A";
+        }
         return header.help;
     }
 

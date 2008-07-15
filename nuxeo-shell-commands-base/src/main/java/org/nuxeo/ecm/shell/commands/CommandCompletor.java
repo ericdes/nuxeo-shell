@@ -29,10 +29,10 @@ import org.nuxeo.ecm.shell.CommandLineService;
  */
 public class CommandCompletor extends jline.SimpleCompletor {
 
-    CommandLineService svc;
+    final CommandLineService svc;
 
     public CommandCompletor(CommandLineService service) {
-        super (service.getCommandNames());
+        super(service.getCommandNames());
         svc = service;
     }
 

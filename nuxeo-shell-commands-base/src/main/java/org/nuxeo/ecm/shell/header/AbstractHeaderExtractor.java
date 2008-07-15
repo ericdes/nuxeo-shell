@@ -35,7 +35,7 @@ public abstract class AbstractHeaderExtractor implements HeaderExtractor {
 
     public CommandHeader extractHeader(Reader r) throws IOException,  ParseException {
         BufferedReader reader  = null;
-        if (reader instanceof BufferedReader) {
+        if (r instanceof BufferedReader) {
             reader = (BufferedReader)r;
         } else {
             reader = new BufferedReader(r);

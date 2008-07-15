@@ -43,7 +43,7 @@ import org.nuxeo.ecm.shell.commands.repository.AbstractCommand;
  */
 public class ScriptingCommand extends AbstractCommand {
 
-    protected static ScriptEngineManager scriptMgr = new ScriptEngineManager();
+    protected static final ScriptEngineManager scriptMgr = new ScriptEngineManager();
 
     protected CompiledScript script;
 

@@ -102,7 +102,7 @@ public class MTFSImportCommand extends AbstractCommand {
     private void printHelp() {
         System.out.println("");
         System.out.println(
-                "Synthax: fsimport local_file_path [remote_path] [batch_size] [nbThreads]");
+                "Syntax: fsimport local_file_path [remote_path] [batch_size] [nbThreads]");
     }
 
     @Override

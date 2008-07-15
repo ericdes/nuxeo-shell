@@ -166,7 +166,7 @@ public class RepoStatsCommand extends AbstractCommand {
 
     private void printHelp() {
         System.out.println("");
-        System.out.println("Synthax: repostats doc_path");
+        System.out.println("Syntha: repostats doc_path");
         System.out.println(
                 " doc_path: reprository path from where stats must be gathered");
         System.out.println(

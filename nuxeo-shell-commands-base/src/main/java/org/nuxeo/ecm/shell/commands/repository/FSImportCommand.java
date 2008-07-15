@@ -100,7 +100,7 @@ public class FSImportCommand extends AbstractCommand {
 
     private void printHelp() {
         System.out.println("");
-        System.out.println("Synthax: fsimport local_file_path [remote_path] [batch_size] [option]");
+        System.out.println("Syntax: fsimport local_file_path [remote_path] [batch_size] [option]");
         System.out.println(" local_file_path : path to a local directory containing files to import");
         System.out.println(" remote_path (optionnal, default=/): reprository path where documents must be created");
         System.out.println(" batch_size (optionnal, default=50): size of import batch");
