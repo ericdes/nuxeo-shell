@@ -54,6 +54,7 @@ public class ScriptingCommandDescriptor implements CommandDescriptor {
     static {
         extractors.put("groovy", new GroovyHeaderExtractor());
         extractors.put("py", new PyHeaderExtractor());
+        extractors.put("js", new GroovyHeaderExtractor());
     }
 
     protected CommandHeader header;
