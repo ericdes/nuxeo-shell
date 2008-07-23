@@ -45,6 +45,7 @@ public class CommandContext extends HashMap<String, Object> {
     private DocumentRef docRef;
     private CommandLine cmdLine;
     private RepositoryInstance repository;
+    private CommandLineService service;
 
     private String host;
 
@@ -53,6 +54,11 @@ public class CommandContext extends HashMap<String, Object> {
     private String username;
 
     private String password;
+
+
+    public CommandContext(CommandLineService service) {
+        this.service = service;
+    }
 
     public String getHost() {
         return host;
@@ -137,6 +143,10 @@ public class CommandContext extends HashMap<String, Object> {
         return getDocumentByPath(getCurrentDocument(), path);
     }
 
+    public CommandLineService getService() {
+        return service;
+    }
+
     /**
      * Whether the shell is running in the context of a local repository
      *
@@ -144,6 +154,15 @@ public class CommandContext extends HashMap<String, Object> {
      */
     public boolean isLocal() {
         return host == null;
+    }
+
+    /**
+     * Shortcut for {@link #getRepositoryInstance()}
+     * @return
+     * @throws Exception
+     */
+    public RepositoryInstance getCoreSession() throws Exception {
+        return getRepositoryInstance();
     }
 
     public RepositoryInstance getRepositoryInstance() throws Exception {

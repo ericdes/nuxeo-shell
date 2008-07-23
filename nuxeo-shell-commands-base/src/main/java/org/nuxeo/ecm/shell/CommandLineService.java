@@ -60,7 +60,7 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         cmds = new Hashtable<String, CommandDescriptor>();
         options = new Hashtable<String, CommandOption>();
         shortcuts = new Hashtable<String, CommandOption>();
-        commandContext = new CommandContext();
+        commandContext = new CommandContext(this);
         context.getRuntimeContext().getBundle().getBundleContext().addFrameworkListener(this);
 
         // register activate script commands

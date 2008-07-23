@@ -2,7 +2,7 @@
 
 Publish the current document into the target section
 
-publish|pub [section:doc]
+publish|pub [docToPublish:doc] [section:doc]
 
 
 This command publish the current document into the given section. 
@@ -14,13 +14,19 @@ import org.nuxeo.common.utils.*;
 
 def params = cmdLine.getParameters();
 if (params.length != 2) {
-  out.println("Syntax Error: the publish command take exactly one parameter - the target section path");
+  out.println("Syntax Error: the publish command take exactly two parameters - the target section path");
   return;
 }
 
-String docPath = params[0];
-String sectionPath = params[1];
-doc = ctx.fetchDocument();
+def session = ctx.getRepositoryInstance();
+def docPath = params[0];
+def sectionPath = params[1];
+def parent = ctx.fetchDocument();
+
+if (!docPath.startsWith("/")) {
+  docPath = parent.getPath().append(docPath).toString();
+}
+doc = session.getDocument(new PathRef(docPath));
 
 out.println("Publishing ${doc.getPathAsString()} into ${sectionPath}");
 
@@ -36,4 +42,5 @@ if (!"Section".equals(section.getType())) {
 }
 
 session.publishDocument(doc, section);
+session.save();
 out.println("Done");
