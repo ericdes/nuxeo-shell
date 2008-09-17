@@ -67,12 +67,15 @@ public class Main {
         String host = cmdLine.getOption(Options.HOST);
         String port = cmdLine.getOption(Options.PORT);
 
-        // try to find the good @IP
-        host= IPHelper.findConnectIP(host, port);
-
         // this logic would be duplicated in a "connect" command
-        cmdContext.setHost(host);
-        cmdContext.setPort(port == null ? 0 : Integer.parseInt(port));
+        if (host != null) {
+            // try to find the good IP
+            host = IPHelper.findConnectIP(host, port);
+            cmdContext.setHost(host);
+            cmdContext.setPort(port == null ? 0 : Integer.parseInt(port));
+        } else { // a local connection ?
+            // do nothing
+        }
         cmdContext.setUsername(cmdLine.getOption(Options.USERNAME));
         cmdContext.setPassword(cmdLine.getOption(Options.PASSWORD));
 
