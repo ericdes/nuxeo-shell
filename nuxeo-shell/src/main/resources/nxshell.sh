@@ -1,3 +1,3 @@
 #!/bin/sh
 
-exec ./run.sh interactive
+exec ./run.sh interactive "$@"
