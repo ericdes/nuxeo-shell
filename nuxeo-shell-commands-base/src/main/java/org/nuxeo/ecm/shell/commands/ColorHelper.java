@@ -53,7 +53,6 @@ public class ColorHelper {
     }
 
     public static String decorateBranchesInBlue(String name) {
-
         // don't add any color for crappy terminals
         if (!supportsColor()) {
             return name;

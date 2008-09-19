@@ -86,14 +86,14 @@ public class HelpCommand implements Command {
 
     public void printCommandHelp(String cmd, PrintStream out) {
         CommandDescriptor cd = service.getCommand(cmd);
+        if (cd == null) {
+            System.err.println("Unknown command: "+cmd);
+            return;
+        }
         try {
             cd.newInstance(); // make sure command definition is loaded
         } catch (Exception  e) {
             // do nothing
-        }
-        if (cd == null) {
-            System.err.println("Unknown command: "+cmd);
-            return;
         }
         // header
         out.println("Command: "+cd.getName()+" - "+cd.getDescription());

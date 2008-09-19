@@ -83,12 +83,12 @@ public class MTFSImportCommand extends AbstractCommand {
         return importTP;
     }
 
-    public synchronized static void addCreatedDoc(String taskId, long nbDocs) {
+    public static synchronized void addCreatedDoc(String taskId, long nbDocs) {
         String tid = Thread.currentThread().getName();
         nbCreatedDocsByThreads.put(tid + "-" + taskId, nbDocs);
     }
 
-    public synchronized static long getCreatedDocsCounter() {
+    public static synchronized long getCreatedDocsCounter() {
         long counter = 0;
         for (String tid : nbCreatedDocsByThreads.keySet()) {
             Long tCounter = nbCreatedDocsByThreads.get(tid);

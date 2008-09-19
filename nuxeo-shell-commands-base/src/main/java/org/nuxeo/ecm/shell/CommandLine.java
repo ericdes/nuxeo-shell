@@ -77,9 +77,12 @@ public class CommandLine extends ArrayList<Token> {
     }
 
     /**
-     * Adds a new option as parsed from the command line. This should be called
-     * by preserving the order as in raw command line. The order is useful for auto-completion
-     * @param arg
+     * Adds a new option as parsed from the command line.
+     * <p>
+     * This should be called by preserving the order as in raw command line. The
+     * order is useful for auto-completion
+     *
+     * @param name
      */
     public Token addOption(String name) {
         Token token = new Token(Token.OPTION, name, size());
@@ -91,7 +94,7 @@ public class CommandLine extends ArrayList<Token> {
     /**
      * Adds a new token was parsed.
      *
-     * @param arg
+     * @param name
      * @param value
      */
     public Token addOptionValue(String name, String value) {

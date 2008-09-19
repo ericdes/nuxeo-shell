@@ -31,7 +31,7 @@ import java.text.ParseException;
  */
 public abstract class AbstractHeaderExtractor implements HeaderExtractor {
 
-    public final static String CRLF = System.getProperty("line.separator");
+    public static final String CRLF = System.getProperty("line.separator");
 
     public CommandHeader extractHeader(Reader r) throws IOException,  ParseException {
         BufferedReader reader  = null;

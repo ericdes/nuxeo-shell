@@ -115,7 +115,6 @@ public class FSImportCommand extends AbstractCommand {
         System.out.println("          " + FULL_INDEXING
                 + " : synchronous and asynchronous indexing activated");
         System.out.println("           if option is not set, no indexing is done");
-
     }
 
     @Override
@@ -201,7 +200,6 @@ public class FSImportCommand extends AbstractCommand {
      * A worker is importing a sub-tree
      *
      * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
-     *
      */
     protected class ImportTask implements Runnable {
 
@@ -242,8 +240,8 @@ public class FSImportCommand extends AbstractCommand {
             }
             this.session = session;
             this.batchSize = batchSize;
-            this.indexingBatchSize = batchSize;
-            this.uploadedFiles = 0;
+            indexingBatchSize = batchSize;
+            uploadedFiles = 0;
         }
 
         protected ImportTask(File rootFile, DocumentModel rootDoc) {
@@ -265,9 +263,9 @@ public class FSImportCommand extends AbstractCommand {
                 fslog(
                         "Comiting Core Session after " + uploadedFiles
                                 + " files", true);
-                fslog(uploadedFiles / (double) ((tcomit - t0) / 1000)
+                fslog(uploadedFiles / ((tcomit - t0) / 1000.0)
                         + " doc/s", true);
-                fslog(uploadedKO / (double) ((tcomit - t0) / 1000) + " KB/s",
+                fslog(uploadedKO / ((tcomit - t0) / 1000.0) + " KB/s",
                         true);
                 session.save();
                 commits += 1;
@@ -384,7 +382,7 @@ public class FSImportCommand extends AbstractCommand {
         }
 
         /**
-         * Modify this to get right mime types depending on the file input
+         * TODO: Modify this to get right mime types depending on the file input.
          *
          * @param file
          * @return
@@ -394,32 +392,33 @@ public class FSImportCommand extends AbstractCommand {
             // have better results
             String fileName = file.getName();
 
-            if (fileName == null)
+            if (fileName == null) {
                 return "application/octet-stream";
-            else if (fileName.endsWith(".doc"))
+            } else if (fileName.endsWith(".doc")) {
                 return "application/msword";
-            else if (fileName.endsWith(".xls"))
+            } else if (fileName.endsWith(".xls")) {
                 return "application/vnd.ms-excel";
-            else if (fileName.endsWith(".ppt"))
+            } else if (fileName.endsWith(".ppt")) {
                 return "application/vnd.ms-powerpoint";
-            else if (fileName.endsWith(".txt"))
+            } else if (fileName.endsWith(".txt")) {
                 return "text/plain";
-            else if (fileName.endsWith(".html"))
+            } else if (fileName.endsWith(".html")) {
                 return "text/html";
-            else if (fileName.endsWith(".xml"))
+            } else if (fileName.endsWith(".xml")) {
                 return "text/xml";
-            else if (fileName.endsWith(".jpg"))
+            } else if (fileName.endsWith(".jpg")) {
                 return "image/jpeg";
-            else if (fileName.endsWith(".jpeg"))
+            } else if (fileName.endsWith(".jpeg")) {
                 return "image/jpeg";
-            else if (fileName.endsWith(".gif"))
+            } else if (fileName.endsWith(".gif")) {
                 return "image/gif";
-            else if (fileName.endsWith(".odt"))
+            } else if (fileName.endsWith(".odt")) {
                 return "application/vnd.oasis.opendocument.text";
-            else if (fileName.endsWith(".zip"))
+            } else if (fileName.endsWith(".zip")) {
                 return "application/zip";
-            else
+            } else {
                 return "application/octet-stream";
+            }
         }
 
         // TODO isRunning is not yet handled correctly
@@ -449,10 +448,10 @@ public class FSImportCommand extends AbstractCommand {
                 long initialCompletedIndexingTasks = 0;
                 if (searchService != null) {
                     oldBatchSize = searchService.getIndexingDocBatchSize();
-                    if (this.batchSize > MAX_IDX_BATCH_SIZE) {
+                    if (batchSize > MAX_IDX_BATCH_SIZE) {
                         indexingBatchSize = MAX_IDX_BATCH_SIZE;
                     } else {
-                        indexingBatchSize = this.batchSize;
+                        indexingBatchSize = batchSize;
                     }
                     searchService.setIndexingDocBatchSize(indexingBatchSize);
                     fslog("Setting indexing batch size to "
@@ -485,8 +484,8 @@ public class FSImportCommand extends AbstractCommand {
                 long t1 = System.currentTimeMillis();
                 // Thread.sleep(2000);
                 fslog(uploadedFiles + " doc created in " + (t1 - t0) + "ms");
-                fslog(uploadedFiles / ((double) ((t1 - t0) / 1000)) + " doc/s");
-                fslog(uploadedKO / ((double) ((t1 - t0) / 1000)) + " KB/s");
+                fslog(uploadedFiles / ((double) ((t1 - t0) / 1000.0)) + " doc/s");
+                fslog(uploadedKO / ((double) ((t1 - t0) / 1000.0)) + " KB/s");
                 if (searchService != null) {
                     fslog("waiting for asynchronous indexing to finish");
                     while (searchService.getActiveIndexingTasks() > 0) {

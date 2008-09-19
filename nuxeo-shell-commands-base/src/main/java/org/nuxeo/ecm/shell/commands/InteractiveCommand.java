@@ -39,16 +39,10 @@ public class InteractiveCommand implements Command {
     private CommandLineService service;
     private ConsoleReader console;
 
-    /**
-     * @return the console.
-     */
     public ConsoleReader getConsole() {
         return console;
     }
 
-    /**
-     * @return the service.
-     */
     public CommandLineService getService() {
         return service;
     }
@@ -146,7 +140,7 @@ public class InteractiveCommand implements Command {
         }
     }
 
-    void beep() {
+    static void beep() {
         System.out.print(7);
     }
 
