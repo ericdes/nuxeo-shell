@@ -79,8 +79,8 @@
       class="org.nuxeo.ecm.shell.commands.repository.TreeCommand"
       alt="tree">
       <description>
-        List directory content and subdirectory content (on remote)
-        reprensented by a tree
+        List directory content and subdirectory content (on remote),
+        represented by a tree
       </description>
       <params>
         <param index="0" type="doc" />
