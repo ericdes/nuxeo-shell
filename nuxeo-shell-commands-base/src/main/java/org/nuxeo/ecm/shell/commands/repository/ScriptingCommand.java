@@ -66,7 +66,7 @@ public class ScriptingCommand extends AbstractCommand {
     public ScriptingCommand(CommandDescriptor descriptor, File file) throws ScriptException {
         this.descriptor = descriptor;
         this.file = file;
-        this.lastModified = file.lastModified();
+        lastModified = file.lastModified();
         //getScript(); // force script compil
     }
 
@@ -75,6 +75,7 @@ public class ScriptingCommand extends AbstractCommand {
         return header;
     }
 
+    @Override
     public void run(CommandLine cmdLine) throws Exception {
         getScript(); // force script compil if needed
         Bindings ctx = new SimpleBindings();
@@ -88,7 +89,6 @@ public class ScriptingCommand extends AbstractCommand {
             System.out.flush();
         }
     }
-
 
     public static CompiledScript compileScript(ScriptEngine engine, File file) throws ScriptException {
         if (engine instanceof Compilable) {
@@ -117,23 +117,19 @@ public class ScriptingCommand extends AbstractCommand {
         return "";
     }
 
-
-    /**
-     * @return the script.
-     */
     public CompiledScript getScript() throws ScriptException, IOException, ParseException {
         if (file.lastModified() > lastModified) {
-            this.script = null;
+            script = null;
         }
-        if (this.script == null) {
+        if (script == null) {
             String ext = getExtension(file);
             ScriptEngine engine = scriptMgr.getEngineByExtension(ext);
-            this.script = compileScript(engine, file);
+            script = compileScript(engine, file);
             HeaderExtractor extractor = extractors.get(ext);
             if (extractor != null) {
                 FileReader reader = new FileReader(file);
                 try {
-                    this.header = extractor.extractHeader(reader);
+                    header = extractor.extractHeader(reader);
                 } finally {
                   reader.close();
                 }
@@ -141,4 +137,5 @@ public class ScriptingCommand extends AbstractCommand {
         }
         return script;
     }
+
 }

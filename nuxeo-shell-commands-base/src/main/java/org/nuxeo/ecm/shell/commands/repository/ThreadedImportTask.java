@@ -72,7 +72,7 @@ public class ThreadedImportTask implements Runnable {
 
     private String taskId = null;
 
-    private synchronized static int getNextTaskId() {
+    private static synchronized int getNextTaskId() {
         taskCounter += 1;
         return taskCounter;
     }
@@ -207,7 +207,7 @@ public class ThreadedImportTask implements Runnable {
                 return null;
             }
             //System.out.println("Created new Thread on " + file.getAbsolutePath());
-            newTask.setBatchSize(this.getBatchSize());
+            newTask.setBatchSize(getBatchSize());
             newTask.setSkipContainerCreation(true);
             return newTask;
         }
@@ -300,7 +300,6 @@ public class ThreadedImportTask implements Runnable {
 
     public synchronized void run() {
         synchronized (this) {
-
             if (isRunning) {
                 throw new IllegalStateException("Task already running");
             }

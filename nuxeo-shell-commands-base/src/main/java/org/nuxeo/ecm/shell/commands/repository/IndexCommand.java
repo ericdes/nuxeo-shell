@@ -142,7 +142,6 @@ public class IndexCommand extends AbstractCommand {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
 }

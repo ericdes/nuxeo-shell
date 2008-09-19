@@ -67,7 +67,7 @@ public class ScriptingCommandDescriptor implements CommandDescriptor {
 
     public ScriptingCommandDescriptor(File file) {
         this.file = file;
-        this.name = FileUtils.getFileNameNoExt(file.getName());
+        name = FileUtils.getFileNameNoExt(file.getName());
     }
 
     public String[] getAliases() {
@@ -180,7 +180,8 @@ public class ScriptingCommandDescriptor implements CommandDescriptor {
         if (file.lastModified() > lastModified) {
             String ext = FileUtils.getFileExtension(file.getName());
             if (ext == null) {
-                throw new IllegalArgumentException("Script File must have a valid extension: "+file.getAbsolutePath());
+                throw new IllegalArgumentException(
+                        "Script File must have a valid extension: " + file.getAbsolutePath());
             }
             cmd = new ScriptingCommand(file);
             HeaderExtractor extractor = extractors.get(ext);

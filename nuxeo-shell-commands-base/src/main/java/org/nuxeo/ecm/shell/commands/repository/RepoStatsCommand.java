@@ -175,7 +175,6 @@ public class RepoStatsCommand extends AbstractCommand {
                 " [includeBlobs] : Boolean indicating if Blob data should introspcetde (optional, default=True)");
     }
 
-
     protected static ThreadPoolExecutor pool;
 
     @Override

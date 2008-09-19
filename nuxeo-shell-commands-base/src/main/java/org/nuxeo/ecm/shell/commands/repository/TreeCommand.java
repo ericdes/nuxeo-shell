@@ -36,11 +36,10 @@ public class TreeCommand extends AbstractCommand {
 
     @Override
     public void run(CommandLine cmdLine) throws Exception {
-
         long t0 = System.currentTimeMillis();
         System.out.println("\n");
-        this.getTreeList(null);
-        System.out.println("\n" + this.getSize() + " docs listed in "
+        getTreeList(null);
+        System.out.println("\n" + getSize() + " docs listed in "
                 + (System.currentTimeMillis() - t0) + "ms\n");
 
     }
@@ -62,7 +61,7 @@ public class TreeCommand extends AbstractCommand {
                 System.out.println(ColorHelper.decorateName(doc, "+ "
                         + doc.getName()));
                 System.out.println(ColorHelper.decorateName(doc, "|"));
-                this.getTreeList(doc.getRef());
+                getTreeList(doc.getRef());
                 // Default Root Type
             } else if (isFolder
                     && (docType.equals("TemplateRoot")
@@ -70,7 +69,7 @@ public class TreeCommand extends AbstractCommand {
                 System.out.println(ColorHelper.decorateName(doc, "| |-+ "
                         + doc.getName()));
                 System.out.println(ColorHelper.decorateName(doc, "| | |"));
-                this.getTreeList(doc.getRef());
+                getTreeList(doc.getRef());
                 // Default SubType
             } else if (isFolder
                     && (docType.equals("Workspace")
@@ -78,14 +77,14 @@ public class TreeCommand extends AbstractCommand {
                 System.out.println(ColorHelper.decorateName(doc, "| | |-+ "
                         + doc.getName()));
                 System.out.println(ColorHelper.decorateName(doc, "| | | |"));
-                this.getTreeList(doc.getRef());
+                getTreeList(doc.getRef());
                 // Documents
             } else {
                 System.out.println(ColorHelper.decorateBranchesInBlue("| | | |")
                         + ColorHelper.decorateName(doc, "- " + doc.getName()));
             }
         }
-        this.setSize(size + docs.size());
+        setSize(size + docs.size());
 
         return size;
     }

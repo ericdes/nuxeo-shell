@@ -33,7 +33,6 @@ import javax.script.ScriptException;
 import javax.script.SimpleBindings;
 
 import org.nuxeo.common.utils.FileUtils;
-import org.nuxeo.ecm.shell.CommandDescriptor;
 import org.nuxeo.ecm.shell.CommandLine;
 import org.nuxeo.ecm.shell.commands.repository.AbstractCommand;
 
@@ -51,6 +50,7 @@ public class ScriptingCommand extends AbstractCommand {
         script = compileScript(file);
     }
 
+    @Override
     public void run(CommandLine cmdLine) throws Exception {
         Bindings ctx = new SimpleBindings();
         ctx.put("cmdLine", cmdLine);

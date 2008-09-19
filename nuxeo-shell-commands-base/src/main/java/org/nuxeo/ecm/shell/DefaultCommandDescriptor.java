@@ -25,7 +25,7 @@ import org.nuxeo.common.xmap.annotation.XNodeList;
 import org.nuxeo.common.xmap.annotation.XObject;
 
 /**
- * A command descriptor. This describe command arguments and help.
+ * A command descriptor. This describes command arguments and help.
  * <p>
  * A command descriptor may be lazy this means when you need to be sure command definition is loaded
  * we must call {@link #load()} before accessing command definition.
@@ -33,7 +33,7 @@ import org.nuxeo.common.xmap.annotation.XObject;
  * When instantiating a command using {@link #newInstance()} the definition
  * will be automatically loaded if needed.
  * <p>
- * Laziness avoid compiling script commands at startup.
+ * Laziness avoids compiling script commands at startup.
  *
  * TODO: support for "bundle:" scripts
  *
@@ -66,9 +66,6 @@ public class DefaultCommandDescriptor implements CommandDescriptor {
     public CommandParameter[] params;
 
 
-    /**
-     *
-     */
     public DefaultCommandDescriptor() {
         // TODO Auto-generated constructor stub
     }
@@ -77,7 +74,6 @@ public class DefaultCommandDescriptor implements CommandDescriptor {
         this.name = name;
         this.klass = klass;
     }
-
 
     public boolean isDynamicScript() {
         return false;
@@ -104,79 +100,46 @@ public class DefaultCommandDescriptor implements CommandDescriptor {
         aliases = StringUtils.split(alt, ',', true);
     }
 
-    /**
-     * @return the aliases.
-     */
     public String[] getAliases() {
         return aliases;
     }
 
-    /**
-     * @return the description.
-     */
     public String getDescription() {
         return description;
     }
 
-    /**
-     * @return the help.
-     */
     public String getHelp() {
         return help;
     }
 
-    /**
-     * @return the name.
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * @return the options.
-     */
     public CommandOption[] getOptions() {
         return options;
     }
 
-    /**
-     * @return the params.
-     */
     public CommandParameter[] getArguments() {
         return params;
     }
 
-    /**
-     * @param params the params to set.
-     */
     public void setParams(CommandParameter[] params) {
         this.params = params;
     }
 
-    /**
-     * @param help the help to set.
-     */
     public void setHelp(String help) {
         this.help = help;
     }
 
-    /**
-     * @param description the description to set.
-     */
     public void setDescription(String description) {
         this.description = description;
     }
 
-    /**
-     * @param aliases the aliases to set.
-     */
     public void setAliases(String[] aliases) {
         this.aliases = aliases;
     }
 
-    /**
-     * @param options the options to set.
-     */
     public void setOptions(CommandOption[] options) {
         this.options = options;
     }

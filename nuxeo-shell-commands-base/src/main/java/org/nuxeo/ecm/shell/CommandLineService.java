@@ -68,7 +68,7 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
     }
 
     /**
-     * Reload script commands
+     * Reloads script commands
      */
     public void reload() {
         File home = Environment.getDefault().getHome();
@@ -288,7 +288,7 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
 //              }
 //          }
 
-        } else { // when no validting we need to insert all pending noption into the command line (needed for autcompletion to work)
+        } else { // when not validating, we need to insert all pending option into the command line (needed for autcompletion to work)
             if (!queue.isEmpty()) {
                 while (!queue.isEmpty()) {
                     CommandOption opt = queue.poll();
@@ -298,7 +298,6 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         }
 
         return cmdLine;
-
     }
 
     public void runCommand(CommandDescriptor cd, CommandLine cmdLine) throws Exception {
@@ -310,7 +309,8 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         if (event.getType() == FrameworkEvent.STARTED) {
             Environment env = Environment.getDefault();
             if (env == null) {
-                System.err.println("Could not start command line service. This service works only with nxshell launcher");
+                System.err.println(
+                        "Could not start command line service. This service works only with nxshell launcher");
                 return;
             }
             String[] args = env.getCommandLineArguments();
@@ -329,7 +329,12 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
             if (newArgs.length > 0) {
                 System.arraycopy(args, k, newArgs, 0, newArgs.length);
             }
-            StandaloneApplication.setMainTask(new Runnable() { public void run() {Main.main(newArgs);} });
+            StandaloneApplication.setMainTask(new Runnable() {
+                public void run() {
+                    Main.main(newArgs);
+                }
+            });
         }
     }
+
 }

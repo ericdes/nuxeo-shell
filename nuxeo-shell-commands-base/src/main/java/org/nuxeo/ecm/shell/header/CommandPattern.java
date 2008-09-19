@@ -25,14 +25,11 @@ import java.util.List;
 
 import org.nuxeo.common.utils.StringUtils;
 
-
-
 /**
  * Ex:
  * cp [--recurse|-r] [--depth|-d:int?1] [--version|-v] file [doc]
  *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
  */
 public class CommandPattern {
 
@@ -52,7 +49,6 @@ public class CommandPattern {
         }
         return buf.toString();
     }
-
 
     public static CommandPattern parsePattern(String input) throws ParseException {
         CommandPattern cmd = new CommandPattern();
@@ -150,7 +146,6 @@ public class CommandPattern {
         return opt;
     }
 
-
     public static void main(String[] args) throws Exception {
         String input = "cp|copy [--recurse|-r] [--depth|-d:int?1] [--version|-v] file [destination:doc]";
         System.out.println(input);
@@ -161,7 +156,6 @@ public class CommandPattern {
         System.out.println(input);
         cmd = parsePattern(input);
         System.out.println(cmd);
-
     }
 
 }
