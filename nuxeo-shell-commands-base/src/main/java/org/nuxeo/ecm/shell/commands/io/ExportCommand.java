@@ -43,7 +43,6 @@ public class ExportCommand implements Command {
     private final NuxeoClient client = NuxeoClient.getInstance();
     private RepositoryInstance repository;
 
-
     public void run(CommandLine cmdLine) throws Exception {
         String[] elements = cmdLine.getParameters();
         // parse cmd line

@@ -39,7 +39,6 @@ public class ListCommand extends AbstractCommand {
         long t0 = System.currentTimeMillis();
         DocumentModelList docs = repo.getChildren(docRef);
 
-
         for (DocumentModel doc : docs) {
             System.out.println(ColorHelper.decorateName(doc, doc.getName()));
         }

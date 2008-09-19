@@ -22,13 +22,8 @@ package org.nuxeo.ecm.shell.header;
 import java.io.File;
 import java.io.FileReader;
 
-
-
-
-
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
  */
 public class PyHeaderExtractor extends AbstractHeaderExtractor {
 
