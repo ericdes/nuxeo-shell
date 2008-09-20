@@ -305,8 +305,17 @@
       </help>
     </command>
 
-  </extension>
+    <command name="serviceinfo"
+      class="org.nuxeo.ecm.shell.commands.system.ServiceInfoCommand">
+      <description>
+        List services
+      </description>
+      <help>
+        TODO
+      </help>
+    </command>
 
+  </extension>
 
   <!-- global options -->
   <extension target="org.nuxeo.ecm.shell.CommandLineService"

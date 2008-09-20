@@ -34,7 +34,8 @@ public class ChangeDirCommand extends AbstractCommand {
     public void run(CommandLine cmdLine) throws Exception {
         String[] elements = cmdLine.getParameters();
         if (elements.length != 1) {
-            System.err.println(cmdLine.getCommand()+" takes exactly one parameter: the path of the directory to go into");
+            System.err.println(cmdLine.getCommand()
+                    + " takes exactly one parameter: the path of the directory to go into");
         }
 
         Path path = new Path(elements[0]);
@@ -48,7 +49,8 @@ public class ChangeDirCommand extends AbstractCommand {
         if (doc.hasFacet(FacetNames.FOLDERISH)) {
             context.setCurrentDocument(doc);
         } else {
-            System.err.println("Target document is not a folder but a "+doc.getType());
+            System.err.println("Target document is not a folder but a "
+                    + doc.getType());
         }
     }
 
