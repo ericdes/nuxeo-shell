@@ -20,6 +20,7 @@ public class RepoStatsCommand extends AbstractCommand {
         private final Map<String, Long> docsPerTypes;
 
         private long totalBlobSize = 0;
+
         private long totalBlobNb = 0;
 
         StatInfo() {
@@ -64,6 +65,7 @@ public class RepoStatsCommand extends AbstractCommand {
     }
 
     public static StatInfo info;
+
     protected Boolean includeBlob = true;
 
     protected class StatTask implements Runnable {
@@ -132,15 +134,17 @@ public class RepoStatsCommand extends AbstractCommand {
             RepoStatsCommand.info.addDoc(doc.getType());
             // XXX check versions too
             if (includeBlob && doc.hasSchema("file")) {
-                //Long size = (Long) doc.getPart("file").resolvePath("content/length").getValue();
+                // Long size = (Long)
+                // doc.getPart("file").resolvePath("content/length").getValue();
                 Long size = (Long) doc.getPart("file").get("content").get(
                         "length").getValue();
                 if (size != null) {
                     RepoStatsCommand.info.addBlob(size);
                 }
-                /*Blob blob = (Blob) doc.getProperty("file", "content");
-                if (blob!=null)
-                    RepoStatsCommand.info.addBlob(blob.getLength());*/
+                /*
+                 * Blob blob = (Blob) doc.getProperty("file", "content"); if
+                 * (blob!=null) RepoStatsCommand.info.addBlob(blob.getLength());
+                 */
             }
         }
     }
@@ -148,14 +152,10 @@ public class RepoStatsCommand extends AbstractCommand {
     private void printHelp() {
         System.out.println("");
         System.out.println("Synthax: repostats doc_path");
-        System.out.println(
-                " doc_path: reprository path from where stats must be gathered");
-        System.out.println(
-                " [nbThreads]: defines the number of cucurrent threads (optional, default=5)");
-        System.out.println(
-                " [includeBlobs] : Boolean indicating if Blob data should introspcetde (optional, default=True)");
+        System.out.println(" doc_path: reprository path from where stats must be gathered");
+        System.out.println(" [nbThreads]: defines the number of cucurrent threads (optional, default=5)");
+        System.out.println(" [includeBlobs] : Boolean indicating if Blob data should introspected (optional, default=false)");
     }
-
 
     protected static ThreadPoolExecutor pool;
 
@@ -165,8 +165,7 @@ public class RepoStatsCommand extends AbstractCommand {
         String[] elements = cmdLine.getParameters();
 
         if (elements.length == 0) {
-            System.out.println(
-                    "SYNTAX ERROR: the repostats command must take at least one argument");
+            System.out.println("SYNTAX ERROR: the repostats command must take at least one argument");
             printHelp();
             return;
         }
@@ -207,9 +206,8 @@ public class RepoStatsCommand extends AbstractCommand {
                 return;
             }
         } else {
-            includeBlob = true;
+            includeBlob = false;
         }
-
 
         info = new StatInfo();
 
@@ -227,39 +225,41 @@ public class RepoStatsCommand extends AbstractCommand {
         int activeTasks = pool.getActiveCount();
         int oldActiveTasks = 0;
         long tprint = t0;
+
         while (activeTasks > 0) {
             Thread.sleep(200);
             activeTasks = pool.getActiveCount();
-            if (oldActiveTasks != activeTasks || System.currentTimeMillis() - tprint > 2000) {
+            if (oldActiveTasks != activeTasks
+                    || System.currentTimeMillis() - tprint > 2000) {
                 oldActiveTasks = activeTasks;
                 tprint = System.currentTimeMillis();
                 System.out.print("Please wait while browsing repository ...");
-                System.out.print(
-                        " - (" + info.getTotalNbDocs() + " docs read so far)");
+                System.out.print(" - (" + info.getTotalNbDocs()
+                        + " docs read so far)");
                 System.out.println(" - (" + activeTasks + " threads working)");
             }
         }
 
-        System.out.println(
-                "Total number of documents : " + info.getTotalNbDocs());
+        System.out.println("Total number of documents : "
+                + info.getTotalNbDocs());
         Map<String, Long> docsPerType = info.getDocsPerType();
         for (String type : docsPerType.keySet()) {
-            System.out.println(
-                    "   number of " + type + " docs : " + docsPerType.get(
-                            type));
+            System.out.println("   number of " + type + " docs : "
+                    + docsPerType.get(type));
         }
         if (includeBlob) {
-            System.out.println(
-                    "Total number of blobs : " + info.getTotalBlobNumber());
-            System.out.println(
-                    "Total size of blobs (MB) : " + ((float) info.getTotalBlobSize() / (1024 * 1024)));
-            System.out.println(
-                    " average blob size (KB) :" + ((float) info.getTotalBlobSize() / 1024) / info.getTotalBlobNumber());
+            System.out.println("Total number of blobs : "
+                    + info.getTotalBlobNumber());
+            System.out.println("Total size of blobs (MB) : "
+                    + ((float) info.getTotalBlobSize() / (1024 * 1024)));
+            System.out.println(" average blob size (KB) :"
+                    + ((float) info.getTotalBlobSize() / 1024)
+                    / info.getTotalBlobNumber());
         }
 
         long t1 = System.currentTimeMillis();
-        System.out.println(
-                "Repository performance during stats was " + 1000 * ((float) info.getTotalNbDocs()) / (t1 - t0) + " doc/s");
+        System.out.println("Repository performance during stats was " + 1000
+                * ((float) info.getTotalNbDocs()) / (t1 - t0) + " doc/s");
     }
 
 }
