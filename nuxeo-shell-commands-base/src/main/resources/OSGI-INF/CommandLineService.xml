@@ -14,14 +14,14 @@
 
   <extension-point name="commands">
     <documentation>
-  Register commands
+      Register commands
     </documentation>
-    <object class="org.nuxeo.ecm.shell.CommandDescriptor"/>
+    <object class="org.nuxeo.ecm.shell.DefaultCommandDescriptor"/>
   </extension-point>
 
   <extension-point name="options">
     <documentation>
-  Register command line options
+      Register command line options
     </documentation>
     <object class="org.nuxeo.ecm.shell.CommandOption"/>
   </extension-point>

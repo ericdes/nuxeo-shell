@@ -25,7 +25,7 @@ import org.nuxeo.ecm.core.api.DocumentModel;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public class ColorHelper {
 
@@ -53,7 +53,6 @@ public class ColorHelper {
     }
 
     public static String decorateBranchesInBlue(String name) {
-
         // don't add any color for crappy terminals
         if (!supportsColor()) {
             return name;

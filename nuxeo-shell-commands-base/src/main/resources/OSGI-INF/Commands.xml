@@ -16,9 +16,10 @@
         Print the result of the command line parser
       </description>
       <help>
-        This command is useful for debuging command line parser
+        This command is useful for debugging command line parser
       </help>
     </command>
+    
     <command name="commands"
       class="org.nuxeo.ecm.shell.commands.CommandsCommand"
       requireConnection="false" alias="cmds">
@@ -30,18 +31,31 @@
         list of commands
       </help>
     </command>
+
     <command name="help"
       class="org.nuxeo.ecm.shell.commands.HelpCommand"
       requireConnection="false" alt="h">
       <description>The Help</description>
       <help />
+      <params>
+        <param index="0" type="cmd" />
+      </params>
     </command>
+
+    <command name="reload"
+      class="org.nuxeo.ecm.shell.commands.ReloadCommand"
+      requireConnection="false" alt="r">
+      <description>Reload command scripts</description>
+      <help />
+    </command>
+
     <command name="interactive"
       class="org.nuxeo.ecm.shell.commands.InteractiveCommand"
       requireConnection="false" alt="i,int">
       <description>Enter interactive mode</description>
       <help>TODO</help>
     </command>
+
     <command name="script"
       class="org.nuxeo.ecm.shell.commands.ScriptCommand" alt="s">
       <options>
@@ -70,8 +84,8 @@
       class="org.nuxeo.ecm.shell.commands.repository.TreeCommand"
       alt="tree">
       <description>
-        List directory content and subdirectory content (on remote) 
-        reprensented by a tree
+        List directory content and subdirectory content (on remote),
+        represented by a tree
       </description>
       <params>
         <param index="0" type="doc" />
@@ -183,7 +197,8 @@
         <param index="1" type="int" />
       </params>
       <help>TODO</help>
-    </command> -->
+    </command>
+-->
 
     <!-- <command name="doubleIndex"
       class="org.nuxeo.ecm.shell.commands.repository.DoubleIndex">
@@ -195,7 +210,8 @@
         <param index="1" type="int" />
       </params>
       <help>TODO</help>
-    </command> -->
+    </command>
+-->
 
     <command name="view"
       class="org.nuxeo.ecm.shell.commands.repository.ViewCommand">
@@ -207,7 +223,6 @@
       </params>
       <help>TODO</help>
     </command>
-
 
     <command name="import"
       class="org.nuxeo.ecm.shell.commands.io.ImportCommand" alt="imp">
@@ -280,8 +295,27 @@
       </help>
     </command>
 
-  </extension>
+    <command name="services"
+      class="org.nuxeo.ecm.shell.commands.system.ServicesCommand">
+      <description>
+        List services
+      </description>
+      <help>
+        TODO
+      </help>
+    </command>
 
+    <command name="serviceinfo"
+      class="org.nuxeo.ecm.shell.commands.system.ServiceInfoCommand">
+      <description>
+        List services
+      </description>
+      <help>
+        TODO
+      </help>
+    </command>
+
+  </extension>
 
   <!-- global options -->
   <extension target="org.nuxeo.ecm.shell.CommandLineService"
@@ -297,9 +331,9 @@
       The password to use when connecting.
     </option>
 
-    <option name="host" shortcut="h" var="true" value="localhost">
-      The host where to connect to. By default 'localhost' is
-      used.
+    <option name="host" shortcut="h" var="true">
+      The host where to connect to. By default no host is used - this
+      will force a local connection (in VM repository)
     </option>
 
     <option name="port" shortcut="p" var="true" value="62474">

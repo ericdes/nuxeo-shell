@@ -1,3 +1,22 @@
+/*
+ * (C) Copyright 2006-2008 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Nuxeo - initial API and implementation
+ *
+ * $Id$
+ */
+
 package org.nuxeo.ecm.shell.commands.repository;
 
 import org.nuxeo.common.utils.Path;
@@ -10,7 +29,7 @@ public class AuditSync extends AbstractCommand {
 
     private void printHelp() {
         System.out.println("");
-        System.out.println("Synthax: auditsync remote_path [clientResursionLevel] ");
+        System.out.println("Syntax: auditsync remote_path [clientResursionLevel] ");
         System.out.println(" remote_path : document path from where audit sync must be launched");
         System.out.println(" subTrans (optionnal, default=0): defines what part of the recursion is done on the client side");
         System.out.println("  (usefull for big DB to avoid EJB3 socket timeout)");

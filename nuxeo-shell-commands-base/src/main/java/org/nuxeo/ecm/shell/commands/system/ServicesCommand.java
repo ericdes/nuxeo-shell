@@ -16,34 +16,34 @@
  *
  * $Id$
  */
+package org.nuxeo.ecm.shell.commands.system;
 
-package org.nuxeo.ecm.shell.commands;
+import java.util.List;
 
-import org.nuxeo.ecm.shell.Command;
-import org.nuxeo.ecm.shell.CommandDescriptor;
 import org.nuxeo.ecm.shell.CommandLine;
-import org.nuxeo.ecm.shell.CommandLineService;
+import org.nuxeo.ecm.shell.commands.repository.AbstractCommand;
+import org.nuxeo.runtime.RuntimeService;
 import org.nuxeo.runtime.api.Framework;
+import org.nuxeo.runtime.model.RegistrationInfo;
 
 /**
- * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
+ * @author <a href="mailto:sf@nuxeo.com">Stefane Fermigier</a>
  *
  */
-public class CommandsCommand implements Command {
+public class ServicesCommand extends AbstractCommand {
 
+    @Override
     public void run(CommandLine cmdLine) throws Exception {
-        CommandLineService service = Framework.getService(
-                CommandLineService.class);
-        CommandDescriptor[] cmds;
-        String[] elements = cmdLine.getParameters();
-        if (elements != null && elements.length == 1) {
-            cmds = service.getMatchingCommands(elements[0]);
-        } else {
-            cmds = service.getSortedCommands();
-        }
-        for (CommandDescriptor cd : cmds) {
-            System.out.println(cd.getName());
+        RuntimeService runtime = Framework.getRuntime();
+        System.out.println(runtime.toString());
+
+        List<RegistrationInfo> ris = util.listRegistrationInfos();
+
+        System.out.println("Registered components (+ state)");
+        for (RegistrationInfo ri : ris) {
+            System.out.println(ri.getName() + ": " + ri.getState());
         }
     }
 
 }
+

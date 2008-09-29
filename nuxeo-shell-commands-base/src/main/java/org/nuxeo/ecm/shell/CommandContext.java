@@ -22,11 +22,16 @@ package org.nuxeo.ecm.shell;
 import java.util.HashMap;
 
 import org.nuxeo.common.utils.Path;
-import org.nuxeo.ecm.core.client.NuxeoClient;
-import org.nuxeo.ecm.core.client.RepositoryInstance;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.core.api.PathRef;
+import org.nuxeo.ecm.core.api.repository.LocalRepositoryInstanceHandler;
+import org.nuxeo.ecm.core.api.repository.Repository;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.api.repository.RepositoryManager;
+import org.nuxeo.ecm.core.client.DefaultLoginHandler;
+import org.nuxeo.ecm.core.client.NuxeoClient;
+import org.nuxeo.runtime.api.Framework;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
@@ -40,6 +45,7 @@ public class CommandContext extends HashMap<String, Object> {
     private DocumentRef docRef;
     private CommandLine cmdLine;
     private RepositoryInstance repository;
+    private CommandLineService service;
 
     private String host;
 
@@ -48,6 +54,11 @@ public class CommandContext extends HashMap<String, Object> {
     private String username;
 
     private String password;
+
+
+    public CommandContext(CommandLineService service) {
+        this.service = service;
+    }
 
     public String getHost() {
         return host;
@@ -132,16 +143,65 @@ public class CommandContext extends HashMap<String, Object> {
         return getDocumentByPath(getCurrentDocument(), path);
     }
 
+    public CommandLineService getService() {
+        return service;
+    }
+
+    /**
+     * Whether the shell is running in the context of a local repository
+     *
+     * @return
+     */
+    public boolean isLocal() {
+        return host == null;
+    }
+
+    /**
+     * Shortcut for {@link #getRepositoryInstance()}
+     * @return
+     * @throws Exception
+     */
+    public RepositoryInstance getCoreSession() throws Exception {
+        return getRepositoryInstance();
+    }
+
     public RepositoryInstance getRepositoryInstance() throws Exception {
         if (repository == null) {
+            // initialize connection
+            if (isLocal()) {
+                // TODO: do here the authentication ...
+            } else if (!NuxeoClient.getInstance().isConnected()) {
+                initalizeConnection();
+            }
+            // open repository
             String repoName = cmdLine.getOption("repository");
-            if (repoName == null) {
-                repository = NuxeoClient.getInstance().openRepository();
+            if (isLocal()) { // connect to a local repository
+                repository = openLocalRepository(repoName == null ? "default" : repoName);
             } else {
-                repository = NuxeoClient.getInstance().openRepository(repoName);
+                if (repoName == null) {
+                    repository = NuxeoClient.getInstance().openRepository();
+                } else {
+                    repository = NuxeoClient.getInstance().openRepository(repoName);
+                }
             }
         }
         return repository;
+    }
+
+    protected void initalizeConnection() throws Exception {
+        NuxeoClient client = NuxeoClient.getInstance();
+        System.out.println("Connecting to nuxeo server at "
+                + host + ':' + port + " as "
+                + (username == null ? "system user" : username));
+        if (username != null && !"system".equals(username)) {
+            client.setLoginHandler(new DefaultLoginHandler(username, password));
+        }
+        client.connect(host, port);
+    }
+
+    public RepositoryInstance openLocalRepository(String name) {
+        Repository repository = Framework.getLocalService(RepositoryManager.class).getDefaultRepository();
+        return new LocalRepositoryInstanceHandler(repository, getUsername()).getProxy();
     }
 
     public DocumentModel getDocumentByPath(DocumentRef base, Path path) throws Exception {
