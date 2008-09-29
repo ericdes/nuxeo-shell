@@ -1,5 +1,7 @@
 package org.nuxeo.ecm.shell.commands.repository;
 
+import java.text.SimpleDateFormat;
+import java.util.Formatter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -23,6 +25,24 @@ public class RepoStatsCommand extends AbstractCommand {
 
         private long totalBlobNb = 0;
 
+        private long lastTotalNbDocs = 0;
+
+        private long lastTotalBlobSize = 0;
+
+        private long lastTotalBlobNb = 0;
+
+        private long maxDepth = 0;
+
+        private String maxDepthPath;
+
+        private long maxChildren;
+
+        private String maxChildrenPath;
+
+        private long maxBlobSize;
+
+        private String maxBlobSizePath;
+
         StatInfo() {
             docsPerTypes = new ConcurrentHashMap<String, Long>();
         }
@@ -31,8 +51,12 @@ public class RepoStatsCommand extends AbstractCommand {
             return docsPerTypes;
         }
 
-        public synchronized void addDoc(String type) {
+        public synchronized void addDoc(String type, Path path) {
             Long counter = docsPerTypes.get(type);
+            if (path.segmentCount() > maxDepth) {
+                maxDepth = path.segmentCount();
+                maxDepthPath = path.toString();
+            }
             if (counter == null) {
                 counter = 1L;
             } else {
@@ -41,9 +65,20 @@ public class RepoStatsCommand extends AbstractCommand {
             docsPerTypes.put(type, counter);
         }
 
-        public synchronized void addBlob(long size) {
+        public synchronized void addBlob(long size, Path path) {
             totalBlobSize += size;
             totalBlobNb += 1;
+            if (size > maxBlobSize) {
+                maxBlobSize = size;
+                maxBlobSizePath = path.toString();
+            }
+        }
+
+        public synchronized void childrenCount(long children, Path path) {
+            if (children > maxChildren) {
+                maxChildren = children;
+                maxChildrenPath = path.toString();
+            }
         }
 
         public long getTotalNbDocs() {
@@ -51,15 +86,30 @@ public class RepoStatsCommand extends AbstractCommand {
             for (String k : docsPerTypes.keySet()) {
                 total += docsPerTypes.get(k);
             }
+            lastTotalNbDocs = total;
             return total;
         }
 
         public long getTotalBlobSize() {
+            lastTotalBlobSize = totalBlobSize;
             return totalBlobSize;
         }
 
         public long getTotalBlobNumber() {
+            lastTotalBlobNb = totalBlobNb;
             return totalBlobNb;
+        }
+
+        public long getLastTotalNbDocs() {
+            return lastTotalNbDocs;
+        }
+
+        public long getLastTotalBlobSize() {
+            return lastTotalBlobSize;
+        }
+
+        public long getLastTotalBlobNumber() {
+            return lastTotalBlobNb;
         }
 
     }
@@ -68,7 +118,19 @@ public class RepoStatsCommand extends AbstractCommand {
 
     protected Boolean includeBlob = true;
 
+    private long t0;
+
+    private long lastStatTime;
+
+    private long printStatCount;
+
+    private static final String printStatHeader = "time     threads      docs  docs/s     blobs   size(M)     M/s tdocs/s tdoc/th/s";
+
+    private static final SimpleDateFormat timeFormater = new SimpleDateFormat(
+            "HH:mm:ss");
+
     protected class StatTask implements Runnable {
+
         private CoreSession session;
 
         private DocumentModel rootDoc;
@@ -114,7 +176,9 @@ public class RepoStatsCommand extends AbstractCommand {
         private void recurse(DocumentModel doc) throws ClientException {
             fetchInfoFromDoc(session, doc);
             if (doc.isFolder()) {
+                long children = 0;
                 for (DocumentModel child : session.getChildren(doc.getRef())) {
+                    children += 1;
                     if (child.isFolder()) {
                         StatTask newTask = getNextTask(child);
                         if (newTask != null) {
@@ -126,12 +190,14 @@ public class RepoStatsCommand extends AbstractCommand {
                         fetchInfoFromDoc(session, child);
                     }
                 }
+                RepoStatsCommand.info.childrenCount(children, doc.getPath());
             }
         }
 
         private void fetchInfoFromDoc(CoreSession session, DocumentModel doc)
                 throws UnsupportedOperationException, ClientException {
-            RepoStatsCommand.info.addDoc(doc.getType());
+            RepoStatsCommand.info.addDoc(doc.getType(), doc.getPath());
+
             // XXX check versions too
             if (includeBlob && doc.hasSchema("file")) {
                 // Long size = (Long)
@@ -139,7 +205,7 @@ public class RepoStatsCommand extends AbstractCommand {
                 Long size = (Long) doc.getPart("file").get("content").get(
                         "length").getValue();
                 if (size != null) {
-                    RepoStatsCommand.info.addBlob(size);
+                    RepoStatsCommand.info.addBlob(size, doc.getPath());
                 }
                 /*
                  * Blob blob = (Blob) doc.getProperty("file", "content"); if
@@ -154,7 +220,44 @@ public class RepoStatsCommand extends AbstractCommand {
         System.out.println("Synthax: repostats doc_path");
         System.out.println(" doc_path: reprository path from where stats must be gathered");
         System.out.println(" [nbThreads]: defines the number of cucurrent threads (optional, default=5)");
-        System.out.println(" [includeBlobs] : Boolean indicating if Blob data should introspected (optional, default=false)");
+        System.out.println(" [includeBlobs]: Boolean indicating if Blob data should introspected (optional, default=false)");
+        System.out.println("Information displayed while gathering data:");
+        System.out.println(" time, number of running threads,");
+        System.out.println(" total number of documents processed, average of documents per second processed,");
+        System.out.println(" number of blobs processed, blobs size in megabytes, average megabytes per second (M/s),");
+        System.out.println(" trend of document per second processed (tdocs/s), trend of document per second and per active thread.");
+    }
+
+    private void printStats(int activeThread) {
+        long now = System.currentTimeMillis();
+        long lastProcessed = info.getLastTotalNbDocs();
+        long processed = info.getTotalNbDocs();
+        long blobProcessed = info.getTotalBlobNumber();
+        long blobSize = info.getTotalBlobSize();
+        long t1;
+        if ((activeThread == 0) && (processed == lastProcessed)) {
+            t1 = lastStatTime;
+        } else {
+            t1 = now;
+        }
+
+        double trend = (processed - lastProcessed)
+                / ((t1 - lastStatTime) / 1000.);
+        double trendThread = trend / activeThread;
+
+        if ((printStatCount % 25) == 0) {
+            System.out.println(printStatHeader);
+        }
+        StringBuilder sb = new StringBuilder();
+        Formatter formatter = new Formatter(sb);
+        formatter.format("%s %7d %9d %7.2f %9d %9.2f %7.3f %7.2f %9.2f",
+                timeFormater.format(now), activeThread, processed,
+                (double) processed / (t1 - t0) * 1000, blobProcessed,
+                blobSize / 1024. / 1024., (double) blobSize / (t1 - t0) / 1024.
+                        / 1024. * 1000, trend, trendThread);
+        System.out.println(sb);
+        printStatCount++;
+        lastStatTime = t1;
     }
 
     protected static ThreadPoolExecutor pool;
@@ -195,7 +298,7 @@ public class RepoStatsCommand extends AbstractCommand {
                 return;
             }
         } else {
-            System.out.println(" Using default Thread number : " + nbThreads);
+            System.out.println(" Using default Thread number: " + nbThreads);
         }
 
         if (elements.length >= 3) {
@@ -216,46 +319,41 @@ public class RepoStatsCommand extends AbstractCommand {
         pool = new ThreadPoolExecutor(nbThreads, nbThreads, 500L,
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(100));
 
-        long t0 = System.currentTimeMillis();
+        t0 = System.currentTimeMillis();
 
         pool.execute(task);
 
         Thread.sleep(100);
 
-        int activeTasks = pool.getActiveCount();
-        int oldActiveTasks = 0;
-        long tprint = t0;
+        do {
+            printStats(pool.getActiveCount());
+            Thread.sleep(1000);
+        } while (pool.getActiveCount() > 0);
+        printStats(pool.getActiveCount());
 
-        while (activeTasks > 0) {
-            Thread.sleep(200);
-            activeTasks = pool.getActiveCount();
-            if (oldActiveTasks != activeTasks
-                    || System.currentTimeMillis() - tprint > 2000) {
-                oldActiveTasks = activeTasks;
-                tprint = System.currentTimeMillis();
-                System.out.print("Please wait while browsing repository ...");
-                System.out.print(" - (" + info.getTotalNbDocs()
-                        + " docs read so far)");
-                System.out.println(" - (" + activeTasks + " threads working)");
-            }
-        }
-
-        System.out.println("Total number of documents : "
-                + info.getTotalNbDocs());
+        System.out.println("Total number of documents:" + info.getTotalNbDocs());
         Map<String, Long> docsPerType = info.getDocsPerType();
         for (String type : docsPerType.keySet()) {
-            System.out.println("   number of " + type + " docs : "
+            System.out.println("   Number of " + type + " docs: "
                     + docsPerType.get(type));
         }
         if (includeBlob) {
-            System.out.println("Total number of blobs : "
+            System.out.println("Total number of blobs:"
                     + info.getTotalBlobNumber());
-            System.out.println("Total size of blobs (MB) : "
+            System.out.println("   Total size of blobs (M): "
                     + ((float) info.getTotalBlobSize() / (1024 * 1024)));
-            System.out.println(" average blob size (KB) :"
+            System.out.println("   Average blob size (K): "
                     + ((float) info.getTotalBlobSize() / 1024)
                     / info.getTotalBlobNumber());
+            System.out.println("   Maximum blob size (M): "
+                    + ((float) info.maxBlobSize / 1024. / 1024.) + " in "
+                    + info.maxBlobSizePath);
         }
+        System.out.println("Folders");
+        System.out.println("   Maximum depth: " + info.maxDepth + " in "
+                + info.maxDepthPath);
+        System.out.println("   Maximum children: " + info.maxChildren + " in "
+                + info.maxChildrenPath);
 
         long t1 = System.currentTimeMillis();
         System.out.println("Repository performance during stats was " + 1000
