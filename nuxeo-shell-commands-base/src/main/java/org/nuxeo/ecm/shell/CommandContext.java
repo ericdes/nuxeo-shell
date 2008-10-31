@@ -19,6 +19,7 @@
 
 package org.nuxeo.ecm.shell;
 
+import java.util.Collection;
 import java.util.HashMap;
 
 import org.nuxeo.common.utils.Path;
@@ -41,6 +42,8 @@ public class CommandContext extends HashMap<String, Object> {
     private CommandLine cmdLine;
     private RepositoryInstance repository;
 
+    private Collection<String> candidateHosts;
+
     private String host;
 
     private int port;
@@ -48,6 +51,14 @@ public class CommandContext extends HashMap<String, Object> {
     private String username;
 
     private String password;
+
+    public Collection<String> getCandidateHosts() {
+        return candidateHosts;
+    }
+
+    public void setCandidateHosts(Collection<String> candidateHosts) {
+        this.candidateHosts = candidateHosts;
+    }
 
     public String getHost() {
         return host;

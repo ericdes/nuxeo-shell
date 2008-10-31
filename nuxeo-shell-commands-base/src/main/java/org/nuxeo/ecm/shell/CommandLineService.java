@@ -22,6 +22,7 @@ package org.nuxeo.ecm.shell;
 import java.text.ParseException;
 import java.util.*;
 
+import org.jboss.remoting.CannotConnectException;
 import org.nuxeo.ecm.core.client.DefaultLoginHandler;
 import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.runtime.model.ComponentContext;
@@ -258,18 +259,31 @@ public class CommandLineService extends DefaultComponent {
 
     public void initalizeConnection() throws Exception {
         NuxeoClient client = NuxeoClient.getInstance();
-        String host = commandContext.getHost();
         int port = commandContext.getPort();
         String username = commandContext.getUsername();
         String password = commandContext.getPassword();
-        System.out.println("Connecting to nuxeo server at "
-                + host + ':' + port + " as "
-                + (username == null ? "system user" : username));
-        if (username != null && !"system".equals(username)) {
-            client.setLoginHandler(new DefaultLoginHandler(username, password));
+        // try connecting to all candidate hosts
+        Exception exc = null;
+        for (String host : commandContext.getCandidateHosts()) {
+            if (username != null && !"system".equals(username)) {
+                client.setLoginHandler(new DefaultLoginHandler(username, password));
+            }
+            try {
+                System.out.println("Trying to connect to nuxeo server at " +
+                        host + ':' + port + " as " +
+                        (username == null ? "system user" : username) + "...");
+                client.connect(host, port);
+                commandContext.setHost(host);
+                break;
+            } catch (CannotConnectException e) {
+                exc = e;
+                continue; // try next host
+            }
         }
-        client.connect(host, port);
-
+        if (commandContext.getHost() == null) {
+            throw new RuntimeException("Could not connect to server", exc);
+        }
+        System.out.println("Connection established");
     }
 
     public void runCommand(CommandDescriptor cd, CommandLine cmdLine) throws Exception {

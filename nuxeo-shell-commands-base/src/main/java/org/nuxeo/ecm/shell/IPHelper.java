@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -17,23 +15,24 @@ import java.util.regex.Pattern;
 public class IPHelper {
 
     private static final String p255 = "(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
-    private static final Pattern IpV4Pattern = Pattern.compile("^(?:" + p255 + "\\.){3}" + p255 + "$");
+
+    private static final Pattern IpV4Pattern = Pattern.compile("^(?:" + p255 +
+            "\\.){3}" + p255 + "$");
+
+    private static final String LOOPBACK = "127.0.0.1";
 
     private IPHelper() {
     }
 
-    public static String findConnectIP(String host, String port) {
-
+    public static Collection<String> findCandidateIPs(String host) {
         Matcher ipMatcher = IpV4Pattern.matcher(host);
         if (ipMatcher.matches()) {
-            return host; // already an @IP
+            // already an IPv4 addess
+            return Collections.singleton(host);
         }
-
-        List<InetAddress> ips = new ArrayList<InetAddress>();
-
-        if ("localhost".equals(host)) {
-            // find every IP bound to a nic
-            try {
+        try {
+            List<String> candidateIPs = new LinkedList<String>();
+            if ("localhost".equals(host)) {
                 Enumeration<NetworkInterface> ifaces = NetworkInterface.getNetworkInterfaces();
                 while (ifaces.hasMoreElements()) {
                     NetworkInterface nic = ifaces.nextElement();
@@ -41,34 +40,23 @@ public class IPHelper {
                     while (addrs.hasMoreElements()) {
                         InetAddress ip = addrs.nextElement();
                         if (ip instanceof Inet4Address) {
-                            ips.add(ip);
+                            candidateIPs.add(ip.getHostAddress());
                         }
                     }
                 }
-            } catch (SocketException e) {
-                return host;
+            } else {
+                for (InetAddress ip : Inet4Address.getAllByName(host)) {
+                    candidateIPs.add(ip.getHostAddress());
+                }
             }
-        } else {
-            try {
-                ips.addAll(Arrays.asList(Inet4Address.getAllByName(host)));
-            } catch (UnknownHostException e) {
-                return host;
+            // put 127.0.0.1 first
+            if (candidateIPs.remove(LOOPBACK)) {
+                candidateIPs.add(0, LOOPBACK);
             }
+            return candidateIPs;
+        } catch (IOException e) {
+            return Collections.singleton(host);
         }
-        int intPort = Integer.parseInt(port);
-
-        // tests IPs
-        for (InetAddress ip : ips) {
-            Socket s;
-            try {
-                s = new Socket(ip, intPort);
-                s.close();
-                return ip.getHostAddress();
-            } catch (IOException e) {
-                // not the right one, let's continue
-            }
-        }
-        return host;
     }
 
 }

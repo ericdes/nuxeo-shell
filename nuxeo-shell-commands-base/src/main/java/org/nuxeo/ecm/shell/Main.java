@@ -69,9 +69,7 @@ public class Main {
 
         // this logic would be duplicated in a "connect" command
         if (host != null) {
-            // try to find the good IP
-            host = IPHelper.findConnectIP(host, port);
-            cmdContext.setHost(host);
+            cmdContext.setCandidateHosts(IPHelper.findCandidateIPs(host));
             cmdContext.setPort(port == null ? 0 : Integer.parseInt(port));
         } else { // a local connection ?
             // do nothing
