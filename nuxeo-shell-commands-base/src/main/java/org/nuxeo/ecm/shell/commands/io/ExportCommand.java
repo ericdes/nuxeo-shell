@@ -21,10 +21,10 @@ package org.nuxeo.ecm.shell.commands.io;
 
 import java.io.File;
 
-import org.nuxeo.ecm.core.client.NuxeoClient;
-import org.nuxeo.ecm.core.client.RepositoryInstance;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.PathRef;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;
@@ -42,7 +42,6 @@ public class ExportCommand implements Command {
 
     private final NuxeoClient client = NuxeoClient.getInstance();
     private RepositoryInstance repository;
-
 
     public void run(CommandLine cmdLine) throws Exception {
         String[] elements = cmdLine.getParameters();

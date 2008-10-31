@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2007 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2008 Nuxeo SAS (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -29,21 +29,18 @@ import org.nuxeo.runtime.api.Framework;
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  *
  */
-public class CommandsCommand implements Command {
+public class ReloadCommand implements Command {
 
     public void run(CommandLine cmdLine) throws Exception {
-        CommandLineService service = Framework.getService(
-                CommandLineService.class);
-        CommandDescriptor[] cmds;
-        String[] elements = cmdLine.getParameters();
-        if (elements != null && elements.length == 1) {
-            cmds = service.getMatchingCommands(elements[0]);
-        } else {
-            cmds = service.getSortedCommands();
-        }
+        CommandLineService service = Framework.getLocalService(CommandLineService.class);
+        // remove existing script commands
+        CommandDescriptor[] cmds = service.getCommands();
         for (CommandDescriptor cd : cmds) {
-            System.out.println(cd.getName());
+            if (cd.isDynamicScript()) {
+                service.removeCommand(cd.getName());
+            }
         }
+        service.reload();
     }
 
 }

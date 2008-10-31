@@ -39,16 +39,10 @@ public class InteractiveCommand implements Command {
     private CommandLineService service;
     private ConsoleReader console;
 
-    /**
-     * @return the console.
-     */
     public ConsoleReader getConsole() {
         return console;
     }
 
-    /**
-     * @return the service.
-     */
     public CommandLineService getService() {
         return service;
     }
@@ -93,7 +87,7 @@ public class InteractiveCommand implements Command {
                 return true;
             }
             runCommand(cmdLine);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             System.err.println("Command failed with error:");
             e.printStackTrace();
         }
@@ -139,14 +133,14 @@ public class InteractiveCommand implements Command {
         } else {
             // show the possbile completions
             for (CommandDescriptor cd : cmds) {
-                System.out.println(cd.name);
+                System.out.println(cd.getName());
             }
             updatePrompt();
             System.out.print(prefix);
         }
     }
 
-    void beep() {
+    static void beep() {
         System.out.print(7);
     }
 

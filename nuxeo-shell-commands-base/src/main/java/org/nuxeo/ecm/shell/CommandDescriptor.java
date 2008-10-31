@@ -19,79 +19,53 @@
 
 package org.nuxeo.ecm.shell;
 
-import org.nuxeo.common.utils.StringUtils;
-import org.nuxeo.common.xmap.annotation.XNode;
-import org.nuxeo.common.xmap.annotation.XNodeList;
-import org.nuxeo.common.xmap.annotation.XObject;
 
 /**
+ *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  *
  */
-@XObject("command")
-public class CommandDescriptor implements Comparable<CommandDescriptor> {
+public interface CommandDescriptor extends Comparable<CommandDescriptor> {
 
-    @XNode("@name")
-    public String name;
 
-    @XNode("@class")
-    public Class<?> klass;
+    boolean isDynamicScript();
 
-    @XNode("@requireConnection")
-    public boolean requireConnection = true;
+    boolean hasOptions();
 
-    @XNode("@interactive")
-    public boolean isInteractive = false;
-
-    public String[] aliases;
-
-    @XNode("description")
-    public String description;
-
-    @XNode("help")
-    public String help;
-
-    @XNodeList(value="options/option", type=CommandOption[].class,
-            componentType=CommandOption.class)
-    public CommandOption[] options;
-
-    @XNodeList(value="params/param", type=CommandParameter[].class,
-            componentType=CommandParameter.class)
-    public CommandParameter[] params;
-
-    @Override
-    public String toString() {
-        return name + " [" + klass + ']';
-    }
+    boolean hasArguments();
 
     /**
-     * Set alternate names
+     * @return the aliases.
      */
-    @XNode("@alt")
-    void setAlt(String alt) {
-        aliases = StringUtils.split(alt, ',', true);
-    }
+    String[] getAliases();
 
-    public int compareTo(CommandDescriptor o) {
-        return name.compareTo(o.name);
-    }
+    /**
+     * @return the description.
+     */
+    String getDescription();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || !(o instanceof CommandDescriptor)) {
-            return false;
-        }
+    /**
+     * @return the help.
+     */
+    String getHelp();
 
-        CommandDescriptor that = (CommandDescriptor) o;
-        return that.name.equals(name);
-    }
 
-    @Override
-    public int hashCode() {
-        return name != null ? name.hashCode() : 0;
-    }
+    /**
+     * @return the name.
+     */
+    String getName();
+
+    /**
+     * @return the options.
+     */
+    CommandOption[] getOptions();
+
+    /**
+     * @return the params.
+     */
+    CommandParameter[] getArguments();
+
+
+    Command newInstance() throws Exception;
 
 }

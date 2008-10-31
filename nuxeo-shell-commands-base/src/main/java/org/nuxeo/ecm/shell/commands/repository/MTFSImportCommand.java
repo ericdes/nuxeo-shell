@@ -1,3 +1,22 @@
+/*
+ * (C) Copyright 2006-2008 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the GNU Lesser General Public License
+ * (LGPL) version 2.1 which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/lgpl.html
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * Contributors:
+ *     Nuxeo - initial API and implementation
+ *
+ * $Id$
+ */
+
 package org.nuxeo.ecm.shell.commands.repository;
 
 import java.io.File;
@@ -64,12 +83,12 @@ public class MTFSImportCommand extends AbstractCommand {
         return importTP;
     }
 
-    public synchronized static void addCreatedDoc(String taskId, long nbDocs) {
+    public static synchronized void addCreatedDoc(String taskId, long nbDocs) {
         String tid = Thread.currentThread().getName();
         nbCreatedDocsByThreads.put(tid + "-" + taskId, nbDocs);
     }
 
-    public synchronized static long getCreatedDocsCounter() {
+    public static synchronized long getCreatedDocsCounter() {
         long counter = 0;
         for (String tid : nbCreatedDocsByThreads.keySet()) {
             Long tCounter = nbCreatedDocsByThreads.get(tid);
@@ -83,7 +102,7 @@ public class MTFSImportCommand extends AbstractCommand {
     private void printHelp() {
         System.out.println("");
         System.out.println(
-                "Synthax: fsimport local_file_path [remote_path] [batch_size] [nbThreads]");
+                "Syntax: fsimport local_file_path [remote_path] [batch_size] [nbThreads]");
     }
 
     @Override

@@ -29,7 +29,7 @@ import org.nuxeo.ecm.shell.CommandLine;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public class IndexCommand extends AbstractCommand {
 
@@ -39,7 +39,7 @@ public class IndexCommand extends AbstractCommand {
 
     private void printHelp() {
         System.out.println("");
-        System.out.println("Synthax: index [repository_name] [path] [batch_size] [full_text]");
+        System.out.println("Syntax: index [repository_name] [path] [batch_size] [full_text]");
         System.out.println(" repository_name (optionnal, default=default): name of the repository to reindex");
         System.out.println(" path (optionnal, default=/): path used for reindex");
         System.out.println(" batch_size (optionnal, default=20): size of reindex batch");
@@ -142,7 +142,6 @@ public class IndexCommand extends AbstractCommand {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
 
 }

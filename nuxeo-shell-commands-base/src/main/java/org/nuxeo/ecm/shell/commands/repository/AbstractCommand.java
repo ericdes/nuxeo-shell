@@ -32,7 +32,7 @@ import org.nuxeo.runtime.api.Framework;
  */
 public abstract class AbstractCommand implements Command {
 
-    protected NuxeoClient client = NuxeoClient.getInstance();
+    protected final NuxeoClient client = NuxeoClient.getInstance();
     protected CommandLineService cmdService;
     protected CommandContext context;
 
