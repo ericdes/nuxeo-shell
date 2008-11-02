@@ -21,8 +21,8 @@ package org.nuxeo.ecm.shell.commands.io;
 
 import java.io.File;
 
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.client.NuxeoClient;
-import org.nuxeo.ecm.core.client.RepositoryInstance;
 import org.nuxeo.ecm.core.io.DocumentPipe;
 import org.nuxeo.ecm.core.io.DocumentReader;
 import org.nuxeo.ecm.core.io.DocumentWriter;

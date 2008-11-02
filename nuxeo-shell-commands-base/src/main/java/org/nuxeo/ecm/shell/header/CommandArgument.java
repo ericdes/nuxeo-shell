@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2007 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2008 Nuxeo SAS (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -17,29 +17,21 @@
  * $Id$
  */
 
-package org.nuxeo.ecm.shell.commands;
-
-import java.util.List;
-
-import org.nuxeo.ecm.shell.CommandLineService;
+package org.nuxeo.ecm.shell.header;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  *
  */
-public class CommandCompletor extends jline.SimpleCompletor {
+public class CommandArgument {
 
-    final CommandLineService svc;
-
-    public CommandCompletor(CommandLineService service) {
-        super(service.getCommandNames());
-        svc = service;
-    }
+    public String name;
+    public String type;
+    public boolean isOptional;
 
     @Override
-    public int complete(String buffer, int cursor, List clist) {
-        setCandidateStrings(svc.getCommandNames());
-        return super.complete(buffer, cursor, clist);
+    public String toString() {
+        return isOptional ? "[" +name+":"+type+"]" : type;
     }
 
 }

@@ -21,8 +21,8 @@ package org.nuxeo.ecm.shell;
 
 import java.text.ParseException;
 
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.client.NuxeoClient;
-import org.nuxeo.ecm.core.client.RepositoryInstance;
 import org.nuxeo.runtime.api.Framework;
 
 /**
@@ -36,13 +36,7 @@ public class Main {
     private Main() {
     }
 
-
     public static void main(String[] args) {
-
-        if (args.length == 0) {
-            System.out.println("Usage java <classname> <cmd> [options] ");
-            System.exit(1);
-        }
 
         CommandLine cmdLine;
         CommandLineService service = Framework.getRuntime().getService(
@@ -57,7 +51,7 @@ public class Main {
 
         String cmdName = cmdLine.getCommand();
         if (cmdName == null) {
-            cmdName = "help";
+            cmdName = "interactive";
             cmdLine.addCommand(cmdName);
         }
 
@@ -95,7 +89,7 @@ public class Main {
 
         try {
             service.runCommand(cd, cmdLine);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             System.exit(2);
         } finally {
@@ -107,7 +101,9 @@ public class Main {
                     }
                 }
                 NuxeoClient.getInstance().tryDisconnect();
+                Framework.shutdown();
                 System.out.println("Bye.");
+                System.exit(0);
             } catch (Exception e) {
                 System.err.println("Failed to Disconnect.");
                 e.printStackTrace();

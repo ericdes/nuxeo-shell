@@ -119,7 +119,7 @@ public class CompositeCompletor implements Completor {
             if (token.type == Token.OPTION) {
                 return -1; // no completion is made on options
             } else if (token.type == Token.VALUE) {
-                if (cd.options == null) {
+                if (!cd.hasOptions()) {
                     return -1;
                 }
                 // get the target option
@@ -138,10 +138,10 @@ public class CompositeCompletor implements Completor {
                     return ret + (list.getBufferPosition() - offset);
                 }
             } else if (token.type == Token.PARAM) {
-                if (cd.params == null) {
+                if (!cd.hasArguments()) {
                     return -1;
                 }
-                for (CommandParameter param : cd.params) {
+                for (CommandParameter param : cd.getArguments()) {
                     if (token.info == param.index) {
                         if (param.type == null || param.type.length() == 0) {
                             return -1;

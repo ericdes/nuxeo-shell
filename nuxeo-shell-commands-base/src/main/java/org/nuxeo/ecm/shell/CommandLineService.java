@@ -19,23 +19,31 @@
 
 package org.nuxeo.ecm.shell;
 
+import java.io.File;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
 
-import org.jboss.remoting.CannotConnectException;
-import org.nuxeo.ecm.core.client.DefaultLoginHandler;
-import org.nuxeo.ecm.core.client.NuxeoClient;
+import org.nuxeo.common.Environment;
+import org.nuxeo.ecm.shell.commands.scripting.ScriptingCommandDescriptor;
+import org.nuxeo.osgi.application.StandaloneApplication;
 import org.nuxeo.runtime.model.ComponentContext;
 import org.nuxeo.runtime.model.ComponentInstance;
 import org.nuxeo.runtime.model.ComponentName;
 import org.nuxeo.runtime.model.DefaultComponent;
-import org.nuxeo.runtime.model.Extension;
+import org.osgi.framework.FrameworkEvent;
+import org.osgi.framework.FrameworkListener;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
  *
  */
-public class CommandLineService extends DefaultComponent {
+public class CommandLineService extends DefaultComponent implements FrameworkListener {
 
     public static final ComponentName NAME = new ComponentName(
             "org.nuxeo.runtime.client.CommandLineService");
@@ -52,11 +60,33 @@ public class CommandLineService extends DefaultComponent {
         cmds = new Hashtable<String, CommandDescriptor>();
         options = new Hashtable<String, CommandOption>();
         shortcuts = new Hashtable<String, CommandOption>();
-        commandContext = new CommandContext();
+        commandContext = new CommandContext(this);
+        context.getRuntimeContext().getBundle().getBundleContext().addFrameworkListener(this);
+
+        // register activate script commands
+        reload();
+    }
+
+    /**
+     * Reloads script commands
+     */
+    public void reload() {
+        File home = Environment.getDefault().getHome();
+        if (home == null) {
+            home = new File(".");
+        }
+        File scriptsDir = new File(home, "scripts");
+        if (scriptsDir.isDirectory()) {
+            for (File file : scriptsDir.listFiles()) {
+                CommandDescriptor cmd = new ScriptingCommandDescriptor(file);
+                cmds.put(cmd.getName(), cmd);
+            }
+        }
     }
 
     @Override
     public void deactivate(ComponentContext context) throws Exception {
+        context.getRuntimeContext().getBundle().getBundleContext().removeFrameworkListener(this);
         cmds.clear();
         options.clear();
         shortcuts.clear();
@@ -68,20 +98,16 @@ public class CommandLineService extends DefaultComponent {
     }
 
     @Override
-    public void registerExtension(Extension extension) throws Exception {
-        super.registerExtension(extension);
-    }
-
-    @Override
     public void registerContribution(Object contribution,
             String extensionPoint, ComponentInstance contributor) {
         if (extensionPoint.equals("commands")) {
             CommandDescriptor cmd = (CommandDescriptor)contribution;
-            cmds.put(cmd.name, cmd);
-            CommandOption[] opts = cmd.options;
+            String name = cmd.getName();
+            cmds.put(name, cmd);
+            CommandOption[] opts = cmd.getOptions();
             if (opts != null) { // register local options
                 for (CommandOption opt : opts) {
-                    opt.setCommand(cmd.name);
+                    opt.setCommand(name);
                     addCommandOption(opt);
                 }
             }
@@ -96,8 +122,8 @@ public class CommandLineService extends DefaultComponent {
             String extensionPoint, ComponentInstance contributor) {
         if (extensionPoint.equals("commands")) {
             CommandDescriptor cmd = (CommandDescriptor)contribution;
-            cmds.remove(cmd.name);
-            CommandOption[] opts = cmd.options;
+            cmds.remove(cmd.getName());
+            CommandOption[] opts = cmd.getOptions();
             if (opts != null) { // unregister local options
                 for (CommandOption opt : opts) {
                     removeCommandOption(opt);
@@ -114,7 +140,7 @@ public class CommandLineService extends DefaultComponent {
     }
 
     public void addCommand(CommandDescriptor cmd) {
-        cmds.put(cmd.name, cmd);
+        cmds.put(cmd.getName(), cmd);
     }
 
     public void removeCommand(String name) {
@@ -138,7 +164,7 @@ public class CommandLineService extends DefaultComponent {
     public CommandDescriptor[] getMatchingCommands(String prefix) {
         List<CommandDescriptor> result = new ArrayList<CommandDescriptor>();
         for (CommandDescriptor cmd : cmds.values()) {
-            if (cmd.name.startsWith(prefix)) {
+            if (cmd.getName().startsWith(prefix)) {
                 result.add(cmd);
             }
         }
@@ -179,8 +205,26 @@ public class CommandLineService extends DefaultComponent {
         if (args.length == 0) {
             return cmdLine;
         }
-        cmdLine.addCommand(args[0]);
-        for (int i = 1; i < args.length; i++) {
+        // skip any option before command name - these may be used by the launcher
+        int k = 0;
+        for (String arg : args) {
+            if (!arg.startsWith("-")) {
+                break;
+            } else {
+                k++;
+            }
+        }
+        // now parse the remaining arguments
+        cmdLine.addCommand(args[k]);
+        // if this is a dynamic script command we disable "validate" because
+        // scripts may not declare the metadata() function that describe the command
+        if (validate) {
+            CommandDescriptor cmd = getCommand(cmdLine.getCommand());
+            if (cmd != null && cmd.isDynamicScript()) {
+                validate = false;
+            }
+        }
+        for (int i = k+1; i < args.length; i++) {
             String arg = args[i];
             CommandOption opt;
             if (arg.startsWith("-")) {
@@ -244,7 +288,7 @@ public class CommandLineService extends DefaultComponent {
 //              }
 //          }
 
-        } else { // when no validting we need to insert all pending noption into the command line (needed for autcompletion to work)
+        } else { // when not validating, we need to insert all pending option into the command line (needed for autcompletion to work)
             if (!queue.isEmpty()) {
                 while (!queue.isEmpty()) {
                     CommandOption opt = queue.poll();
@@ -254,48 +298,43 @@ public class CommandLineService extends DefaultComponent {
         }
 
         return cmdLine;
-
-    }
-
-    public void initalizeConnection() throws Exception {
-        NuxeoClient client = NuxeoClient.getInstance();
-        int port = commandContext.getPort();
-        String username = commandContext.getUsername();
-        String password = commandContext.getPassword();
-        // try connecting to all candidate hosts
-        Exception exc = null;
-        for (String host : commandContext.getCandidateHosts()) {
-            if (username != null && !"system".equals(username)) {
-                client.setLoginHandler(new DefaultLoginHandler(username, password));
-            }
-            try {
-                System.out.println("Trying to connect to nuxeo server at " +
-                        host + ':' + port + " as " +
-                        (username == null ? "system user" : username) + "...");
-                client.connect(host, port);
-                commandContext.setHost(host);
-                break;
-            } catch (CannotConnectException e) {
-                exc = e;
-                continue; // try next host
-            }
-        }
-        if (commandContext.getHost() == null) {
-            throw new RuntimeException("Could not connect to server", exc);
-        }
-        System.out.println("Connection established");
     }
 
     public void runCommand(CommandDescriptor cd, CommandLine cmdLine) throws Exception {
-        Command command = (Command)cd.klass.newInstance();
-        NuxeoClient client = NuxeoClient.getInstance();
-        if (cd.requireConnection && !client.isConnected()) {
-            initalizeConnection();
-            command.run(cmdLine);
-        } else {
-            command.run(cmdLine);
-        }
+        Command command = cd.newInstance();
+        command.run(cmdLine);
     }
 
+    public void frameworkEvent(FrameworkEvent event) {
+        if (event.getType() == FrameworkEvent.STARTED) {
+            Environment env = Environment.getDefault();
+            if (env == null) {
+                System.err.println(
+                        "Could not start command line service. This service works only with nxshell launcher");
+                return;
+            }
+            String[] args = env.getCommandLineArguments();
+            int k = -1;
+            // search for the "-exec" option
+            for (int i=0; i<args.length; i++) {
+                if (args[i].equals("-console")) {
+                    k = i+1;
+                    break;
+                }
+            }
+            if (k == -1) {
+                return; // do not activate the console
+            }
+            final String[] newArgs = new String[args.length-k];
+            if (newArgs.length > 0) {
+                System.arraycopy(args, k, newArgs, 0, newArgs.length);
+            }
+            StandaloneApplication.setMainTask(new Runnable() {
+                public void run() {
+                    Main.main(newArgs);
+                }
+            });
+        }
+    }
 
 }

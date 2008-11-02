@@ -42,10 +42,27 @@
         <version>${nuxeo.runtime.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.nuxeo.runtime</groupId>
+        <artifactId>nuxeo-runtime-launcher</artifactId>
+        <version>${nuxeo.runtime.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.nuxeo.runtime</groupId>
+        <artifactId>nuxeo-runtime-osgi</artifactId>
+        <version>${nuxeo.runtime.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.nuxeo.ecm.core</groupId>
         <artifactId>nuxeo-core-client</artifactId>
         <version>${nuxeo.core.version}</version>
       </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>osgi-core</artifactId>
+      <version>4.1</version>
+    </dependency>
 
       <!-- jboss client -->
       <dependency>
@@ -69,33 +86,11 @@
         <version>0.9.91</version>
       </dependency>
       <dependency>
-        <groupId>org.osgi</groupId>
-        <artifactId>osgi-core</artifactId>
-	<version>4.1</version>
-      </dependency>
-      <dependency>
         <groupId>commons-logging</groupId>
         <artifactId>commons-logging</artifactId>
         <version>1.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
-  
-  <repositories>
-    <repository>
-      <id>nuxeo_release</id>
-      <url>http://archiva.nuxeo.org/archiva/repository/nuxeo_release</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>nuxeo_snapshot</id>
-      <url>http://archiva.nuxeo.org/archiva/repository/nuxeo_snapshot</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-  </repositories>
-  
+
 </project>

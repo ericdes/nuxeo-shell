@@ -19,12 +19,12 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
-import org.nuxeo.ecm.core.client.RepositoryInstance;
-import org.nuxeo.ecm.shell.CommandLine;
-import org.nuxeo.ecm.shell.commands.ColorHelper;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.DocumentRef;
+import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
+import org.nuxeo.ecm.shell.CommandLine;
+import org.nuxeo.ecm.shell.commands.ColorHelper;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
@@ -38,7 +38,6 @@ public class ListCommand extends AbstractCommand {
         DocumentRef docRef = context.getCurrentDocument();
         long t0 = System.currentTimeMillis();
         DocumentModelList docs = repo.getChildren(docRef);
-
 
         for (DocumentModel doc : docs) {
             System.out.println(ColorHelper.decorateName(doc, doc.getName()));
