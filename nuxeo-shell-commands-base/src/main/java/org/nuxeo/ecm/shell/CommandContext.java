@@ -164,7 +164,7 @@ public class CommandContext extends HashMap<String, Object> {
      * @return
      */
     public boolean isLocal() {
-        return host == null;
+        return candidateHosts == null;
     }
 
     /**
@@ -187,7 +187,7 @@ public class CommandContext extends HashMap<String, Object> {
             // open repository
             String repoName = cmdLine.getOption("repository");
             if (isLocal()) { // connect to a local repository
-                repository = openLocalRepository(repoName == null ? "default" : repoName);
+                repository = openLocalRepository(repoName);
             } else {
                 if (repoName == null) {
                     repository = NuxeoClient.getInstance().openRepository();
@@ -229,8 +229,18 @@ public class CommandContext extends HashMap<String, Object> {
         System.out.println("Connection established");
     }
 
-    public RepositoryInstance openLocalRepository(String name) {
-        Repository repository = Framework.getLocalService(RepositoryManager.class).getDefaultRepository();
+    public RepositoryInstance openLocalRepository(String repoName) {
+        RepositoryManager repositoryManager = Framework.getLocalService(RepositoryManager.class);
+        Repository repository;
+        if (repoName == null) {
+            repository = repositoryManager.getDefaultRepository();
+        } else {
+            repository = repositoryManager.getRepository(repoName);
+        }
+        if (repository == null) {
+            throw new IllegalArgumentException("No local repository" +
+                    (repoName == null ? "" : " named '" + repoName + "'"));
+        }
         return new LocalRepositoryInstanceHandler(repository, getUsername()).getProxy();
     }
 
