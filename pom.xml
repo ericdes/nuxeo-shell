@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.nuxeo.ecm.platform</groupId>
     <artifactId>nuxeo-platform-parent</artifactId>
-    <version>5.1.7-SNAPSHOT</version>
+    <version>5.2-SNAPSHOT</version>
   </parent>
 
   <groupId>org.nuxeo.ecm.platform</groupId>
@@ -12,10 +12,10 @@
   <packaging>pom</packaging>
   <name>Nuxeo Shell Parent</name>
   <description>Nuxeo ECM: Shell Parent</description>
-  <version>5.1.7-SNAPSHOT</version>
+  <version>5.2-SNAPSHOT</version>
 
   <properties>
-    <nuxeo.shell.version>5.1.7-SNAPSHOT</nuxeo.shell.version>
+    <nuxeo.shell.version>5.2-SNAPSHOT</nuxeo.shell.version>
   </properties>
 
   <modules>
@@ -66,29 +66,21 @@
 
       <!-- jboss client -->
       <dependency>
-        <groupId>jboss</groupId>
-        <artifactId>jboss-aspect-jdk50-client</artifactId>
-        <version>1.5</version>
+        <groupId>org.jboss.client</groupId>
+        <artifactId>jbossall-client</artifactId>
+        <version>4.2.3.GA</version>
       </dependency>
+
       <dependency>
-        <groupId>jboss</groupId>
-        <artifactId>jboss-transaction-client</artifactId>
-        <version>4.0.4.GA</version>
+        <groupId>org.osgi</groupId>
+        <artifactId>osgi-core</artifactId>
+        <version>4.1</version>
       </dependency>
-      <dependency>
-        <groupId>jboss</groupId>
-        <artifactId>jboss-client</artifactId>
-        <version>4.0.2</version>
-      </dependency>
+
       <dependency>
         <groupId>jline</groupId>
         <artifactId>jline</artifactId>
         <version>0.9.94</version>
-      </dependency>
-      <dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>1.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
