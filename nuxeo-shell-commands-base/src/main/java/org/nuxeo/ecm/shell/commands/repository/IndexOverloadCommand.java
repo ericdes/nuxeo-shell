@@ -106,7 +106,7 @@ public class IndexOverloadCommand extends AbstractCommand {
         }
         System.out.println("Sending tasks to search service threda pool");
         for (int i = 0; i < nb; i++) {
-            searchService.indexInThread(dm, false, true);
+            System.out.println("!!! explicit indexing is disabled !!!");
         }
 
         while (searchService.getActiveIndexingTasks() > 0) {
