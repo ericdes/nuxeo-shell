@@ -117,10 +117,9 @@ public class CommandPattern {
     }
 
     public static int collectUntil(char sep, StringBuilder buf, String input, int offset) {
-        char c;
         int len = input.length();
         for (int i=offset; i<len; i++) {
-            c = input.charAt(i);
+            char c = input.charAt(i);
             if (c == sep) {
                 return i;
             }

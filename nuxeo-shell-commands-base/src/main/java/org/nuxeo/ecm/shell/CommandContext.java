@@ -47,7 +47,7 @@ public class CommandContext extends HashMap<String, Object> {
     private DocumentRef docRef;
     private CommandLine cmdLine;
     private RepositoryInstance repository;
-    private CommandLineService service;
+    private final CommandLineService service;
 
     private Collection<String> candidateHosts;
 

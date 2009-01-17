@@ -484,8 +484,8 @@ public class FSImportCommand extends AbstractCommand {
                 long t1 = System.currentTimeMillis();
                 // Thread.sleep(2000);
                 fslog(uploadedFiles + " doc created in " + (t1 - t0) + "ms");
-                fslog(uploadedFiles / ((double) ((t1 - t0) / 1000.0)) + " doc/s");
-                fslog(uploadedKO / ((double) ((t1 - t0) / 1000.0)) + " KB/s");
+                fslog(uploadedFiles / ((t1 - t0) / 1000.0) + " doc/s");
+                fslog(uploadedKO / ((t1 - t0) / 1000.0) + " KB/s");
                 if (searchService != null) {
                     fslog("waiting for asynchronous indexing to finish");
                     while (searchService.getActiveIndexingTasks() > 0) {

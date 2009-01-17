@@ -19,7 +19,6 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
-import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.search.api.client.IndexingException;

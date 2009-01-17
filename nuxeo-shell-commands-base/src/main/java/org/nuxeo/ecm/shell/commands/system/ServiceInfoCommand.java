@@ -84,7 +84,7 @@ public class ServiceInfoCommand extends AbstractCommand {
         if (serviceNames.length > 0) {
             sb.append("Provides:\n");
             for (String serviceName : serviceNames) {
-                sb.append("- " + serviceName + "\n");
+                sb.append("- ").append(serviceName).append("\n");
             }
             sb.append("\n");
         }
@@ -93,8 +93,8 @@ public class ServiceInfoCommand extends AbstractCommand {
         if (propertyNames.length > 0) {
             sb.append("Properties:\n");
             for (String propertyName : propertyNames) {
-                sb.append("- " + propertyName + " : "
-                        + component.getProperty(propertyName).getValue() + "\n");
+                sb.append("- ").append(propertyName).append(" : ")
+                        .append(component.getProperty(propertyName).getValue()).append("\n");
             }
             sb.append("\n");
         }
@@ -103,7 +103,7 @@ public class ServiceInfoCommand extends AbstractCommand {
         if (extensionPoints.length > 0) {
             sb.append("Extension Points:\n");
             for (ExtensionPoint xp : extensionPoints) {
-                sb.append("- " + xp.getName() + "\n");
+                sb.append("- ").append(xp.getName()).append("\n");
             }
             sb.append("\n");
         }
@@ -136,13 +136,17 @@ public class ServiceInfoCommand extends AbstractCommand {
         if (doctypes.length > 0) {
             sb.append("Document Types:\n");
             for (DocumentType doctype : doctypes) {
-                sb.append("- " + doctype.getName() + "\n");
+                sb.append("- ").append(doctype.getName()).append("\n");
 
                 Collection<Schema> schemas = doctype.getSchemas();
                 if (schemas.size() > 0) {
                     sb.append("  Schemas: ");
                     for (Schema schema : schemas) {
-                        sb.append(schema.getName()).append(" ");
+                        if (schema != null) {
+                            sb.append(schema.getName()).append(" ");
+                        } else {
+                            sb.append("(null)").append(" ");
+                        }
                     }
                     sb.append("\n");
                 }
@@ -163,7 +167,7 @@ public class ServiceInfoCommand extends AbstractCommand {
         if (schemas.length > 0) {
             sb.append("Schemas:\n");
             for (Schema schema : schemas) {
-                sb.append("- " + schema.getName() + "\n");
+                sb.append("- ").append(schema.getName()).append("\n");
             }
             sb.append("\n");
         }
@@ -172,7 +176,7 @@ public class ServiceInfoCommand extends AbstractCommand {
         if (types.length > 0) {
             sb.append("Types:\n");
             for (Type type : types) {
-                sb.append("- " + type.getName() + "\n");
+                sb.append("- ").append(type.getName()).append("\n");
             }
             sb.append("\n");
         }

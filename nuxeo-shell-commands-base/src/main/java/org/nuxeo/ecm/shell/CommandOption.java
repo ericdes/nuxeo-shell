@@ -58,7 +58,6 @@ public class CommandOption {
     String help;
 
     public CommandOption() {
-
     }
 
     public CommandOption(String name) {
@@ -84,11 +83,9 @@ public class CommandOption {
         isVariable = !value;
     }
 
-
     public boolean isRequired() {
         return isRequired;
     }
-
 
     public boolean isVariable() {
         return isVariable;
@@ -98,72 +95,42 @@ public class CommandOption {
         return !isVariable;
     }
 
-    /**
-     * @return the defaultValue.
-     */
     public String getDefaultValue() {
         return defaultValue;
     }
 
-    /**
-     * @param defaultValue the defaultValue to set.
-     */
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
     }
 
-    /**
-     * @return the name.
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * @param name the name to set.
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * @return the shortcut.
-     */
     public String getShortcut() {
         return shortcut;
     }
 
-    /**
-     * @param shortcut the shortcut to set.
-     */
     public void setShortcut(String shortcut) {
         this.shortcut = shortcut;
     }
 
-    /**
-     * @return the command.
-     */
     public String getCommand() {
         return command;
     }
 
-    /**
-     * @param command the command to set.
-     */
     public void setCommand(String command) {
         this.command = command;
     }
 
-    /**
-     * @return the documentation.
-     */
     public String getHelp() {
         return help;
     }
 
-    /**
-     * @param help the documentation to set.
-     */
     public void setHelp(String help) {
         this.help = help;
     }
@@ -173,16 +140,10 @@ public class CommandOption {
         return name;
     }
 
-    /**
-     * @return the type.
-     */
     public String getType() {
         return type;
     }
 
-    /**
-     * @param type the type to set.
-     */
     public void setType(String type) {
         this.type = type;
     }
