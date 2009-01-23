@@ -19,7 +19,8 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
-import org.nuxeo.ecm.core.api.ClientException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.search.api.client.IndexingException;
@@ -28,6 +29,7 @@ import org.nuxeo.ecm.core.search.api.client.common.SearchServiceDelegate;
 import org.nuxeo.ecm.shell.CommandLine;
 
 public class IndexOverloadCommand extends AbstractCommand {
+    private static final Log log = LogFactory.getLog(IndexOverloadCommand.class);
 
     private void printHelp() {
         System.out.println("");
@@ -56,7 +58,7 @@ public class IndexOverloadCommand extends AbstractCommand {
             try {
                 nb = Integer.parseInt(elements[1]);
             } catch (Throwable t) {
-                System.err.println("Failed to parse nb");
+                log.error("Failed to parse nb", t);
                 printHelp();
                 return;
             }
@@ -69,7 +71,7 @@ public class IndexOverloadCommand extends AbstractCommand {
             try {
                 batchSize = Integer.parseInt(elements[2]);
             } catch (Throwable t) {
-                System.err.println("Failed to parse batch size");
+                log.error("Failed to parse batch size", t);
                 printHelp();
                 return;
             }
@@ -87,8 +89,7 @@ public class IndexOverloadCommand extends AbstractCommand {
             if (searchService == null) {
                 throw new IndexingException("Cannot find search service");
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new IndexingException("Cannot find search service", e);
         }
 
@@ -101,21 +102,21 @@ public class IndexOverloadCommand extends AbstractCommand {
 
         if (nb > 100) {
             nb = 100;
-            System.out.println(
-                    "Nb of indexing tasks reduced to max queue size (100)");
+            log.info("Nb of indexing tasks reduced to max queue size (100)");
         }
-        System.out.println("Sending tasks to search service threda pool");
+        log.info("Sending tasks to search service threda pool");
         for (int i = 0; i < nb; i++) {
             searchService.indexInThread(dm, false, true);
         }
 
         while (searchService.getActiveIndexingTasks() > 0) {
             Thread.sleep(500);
-            long nbTasksToGo = searchService.getActiveIndexingTasks() + searchService.getIndexingWaitingQueueSize();
-            System.out.println("still " + nbTasksToGo + " tasks to run");
+            long nbTasksToGo = searchService.getActiveIndexingTasks()
+                    + searchService.getIndexingWaitingQueueSize();
+            log.info("still " + nbTasksToGo + " tasks to run");
         }
 
-        System.out.println("Terminated : doc indexed " + nb + " times");
+        log.info("Terminated : doc indexed " + nb + " times");
 
         searchService.setIndexingDocBatchSize(oldBatchSize);
     }

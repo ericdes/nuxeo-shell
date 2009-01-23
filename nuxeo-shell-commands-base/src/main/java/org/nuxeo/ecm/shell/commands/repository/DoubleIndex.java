@@ -19,18 +19,21 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.shell.CommandLine;
 
 public class DoubleIndex extends AbstractCommand {
 
+    private static final Log log = LogFactory.getLog(DoubleIndex.class);
+
     private void printHelp() {
         System.out.println("");
         System.out.println("Syntax: DoubleIndex doc_path [nb] ");
         System.out.println(" doc_path path of the doc to index");
-        System.out.println(
-                " nb number of sync indexing request inside transaction");
+        System.out.println(" nb number of sync indexing request inside transaction");
     }
 
     @Override
@@ -52,7 +55,7 @@ public class DoubleIndex extends AbstractCommand {
             try {
                 nb = Integer.parseInt(elements[1]);
             } catch (Throwable t) {
-                System.err.println("Failed to parse nb");
+                log.error("Failed to parse nb");
                 printHelp();
                 return;
             }

@@ -19,6 +19,8 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.common.utils.Path;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.schema.FacetNames;
@@ -29,12 +31,13 @@ import org.nuxeo.ecm.shell.CommandLine;
  *
  */
 public class ChangeDirCommand extends AbstractCommand {
-
+    private static final Log log = LogFactory.getLog(ChangeDirCommand.class);
+    
     @Override
     public void run(CommandLine cmdLine) throws Exception {
         String[] elements = cmdLine.getParameters();
         if (elements.length != 1) {
-            System.err.println(cmdLine.getCommand()
+            log.error(cmdLine.getCommand()
                     + " takes exactly one parameter: the path of the directory to go into");
         }
 
@@ -43,13 +46,13 @@ public class ChangeDirCommand extends AbstractCommand {
         try {
             doc = context.fetchDocument(path);
         } catch (Exception e) {
-            System.err.println("Failed to retrieve the given folder");
+            log.error("Failed to retrieve the given folder",e);
             return;
         }
         if (doc.hasFacet(FacetNames.FOLDERISH)) {
             context.setCurrentDocument(doc);
         } else {
-            System.err.println("Target document is not a folder but a "
+            log.error("Target document is not a folder but a "
                     + doc.getType());
         }
     }

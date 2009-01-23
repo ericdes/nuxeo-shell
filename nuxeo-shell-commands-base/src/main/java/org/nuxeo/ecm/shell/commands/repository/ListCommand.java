@@ -19,6 +19,8 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.DocumentRef;
@@ -31,7 +33,8 @@ import org.nuxeo.ecm.shell.commands.ColorHelper;
  *
  */
 public class ListCommand extends AbstractCommand {
-
+    private static final Log log = LogFactory.getLog(ListCommand.class);
+    
     @Override
     public void run(CommandLine cmdLine) throws Exception {
         RepositoryInstance repo = context.getRepositoryInstance();
@@ -40,10 +43,10 @@ public class ListCommand extends AbstractCommand {
         DocumentModelList docs = repo.getChildren(docRef);
 
         for (DocumentModel doc : docs) {
-            System.out.println(ColorHelper.decorateName(doc, doc.getName()));
+            log.info(ColorHelper.decorateName(doc, doc.getName()));
         }
 
-        System.out.println(docs.size() + " docs listed in " + (System.currentTimeMillis()-t0) + "ms");
+        log.info(docs.size() + " docs listed in " + (System.currentTimeMillis()-t0) + "ms");
     }
 
 }

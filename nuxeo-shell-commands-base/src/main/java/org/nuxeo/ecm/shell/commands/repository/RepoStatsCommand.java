@@ -27,6 +27,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.common.utils.Path;
 import org.nuxeo.ecm.core.api.ClientException;
 import org.nuxeo.ecm.core.api.CoreInstance;
@@ -36,6 +38,8 @@ import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.ecm.shell.CommandLine;
 
 public class RepoStatsCommand extends AbstractCommand {
+
+    private static final Log log = LogFactory.getLog(RepoStatsCommand.class);
 
     private static class StatInfo {
         private final Map<String, Long> docsPerTypes;
@@ -163,7 +167,7 @@ public class RepoStatsCommand extends AbstractCommand {
             try {
                 CoreInstance.getInstance().close(session);
             } catch (Exception e) {
-                e.printStackTrace();// TODO
+                log.error(e);
             }
         }
 
@@ -174,7 +178,7 @@ public class RepoStatsCommand extends AbstractCommand {
                 try {
                     CoreInstance.getInstance().close(session);
                 } catch (Exception e1) {
-                    e1.printStackTrace();// TODO
+                    log.error(e);
                 }
             }
         }
@@ -265,16 +269,13 @@ public class RepoStatsCommand extends AbstractCommand {
         double trendThread = trend / activeThread;
 
         if ((printStatCount % 25) == 0) {
-            System.out.println(printStatHeader);
+            log.info(printStatHeader);
         }
-        StringBuilder sb = new StringBuilder();
-        Formatter formatter = new Formatter(sb);
-        formatter.format("%s %7d %9d %7.2f %9d %9.2f %7.3f %7.2f %9.2f",
+        log.info(String.format("%s %7d %9d %7.2f %9d %9.2f %7.3f %7.2f %9.2f",
                 timeFormater.format(now), activeThread, processed,
                 (double) processed / (t1 - t0) * 1000, blobProcessed,
                 blobSize / 1024. / 1024., (double) blobSize / (t1 - t0) / 1024.
-                        / 1024. * 1000, trend, trendThread);
-        System.out.println(sb);
+                        / 1024. * 1000, trend, trendThread));
         printStatCount++;
         lastStatTime = t1;
     }
@@ -287,7 +288,7 @@ public class RepoStatsCommand extends AbstractCommand {
         String[] elements = cmdLine.getParameters();
 
         if (elements.length == 0) {
-            System.out.println("SYNTAX ERROR: the repostats command must take at least one argument");
+            log.error("SYNTAX ERROR: the repostats command must take at least one argument");
             printHelp();
             return;
         }
@@ -303,7 +304,7 @@ public class RepoStatsCommand extends AbstractCommand {
             try {
                 root = context.fetchDocument(path);
             } catch (Exception e) {
-                System.err.println("Failed to retrieve the given folder");
+                log.error("Failed to retrieve the given folder", e);
                 return;
             }
         }
@@ -313,18 +314,18 @@ public class RepoStatsCommand extends AbstractCommand {
             try {
                 nbThreads = Integer.parseInt(elements[1]);
             } catch (Exception e) {
-                System.err.println("Failed to parse number of threads");
+                log.error("Failed to parse number of threads", e);
                 return;
             }
         } else {
-            System.out.println(" Using default Thread number: " + nbThreads);
+            log.info(" Using default Thread number: " + nbThreads);
         }
 
         if (elements.length >= 3) {
             try {
                 includeBlob = Boolean.parseBoolean(elements[2]);
             } catch (Exception e) {
-                System.err.println("Failed to parse the includeBlob parameter");
+                log.error("Failed to parse the includeBlob parameter", e);
                 return;
             }
         } else {
@@ -350,32 +351,30 @@ public class RepoStatsCommand extends AbstractCommand {
         } while (pool.getActiveCount() > 0);
         printStats(pool.getActiveCount());
 
-        System.out.println("Total number of documents:" + info.getTotalNbDocs());
+        log.info("Total number of documents:" + info.getTotalNbDocs());
         Map<String, Long> docsPerType = info.getDocsPerType();
         for (String type : docsPerType.keySet()) {
-            System.out.println("   Number of " + type + " docs: "
-                    + docsPerType.get(type));
+            log.info("   Number of " + type + " docs: " + docsPerType.get(type));
         }
         if (includeBlob) {
-            System.out.println("Total number of blobs:"
-                    + info.getTotalBlobNumber());
-            System.out.println("   Total size of blobs (M): "
+            log.info("Total number of blobs:" + info.getTotalBlobNumber());
+            log.info("   Total size of blobs (M): "
                     + ((float) info.getTotalBlobSize() / (1024 * 1024)));
-            System.out.println("   Average blob size (K): "
+            log.info("   Average blob size (K): "
                     + ((float) info.getTotalBlobSize() / 1024)
                     / info.getTotalBlobNumber());
-            System.out.println("   Maximum blob size (M): "
+            log.info("   Maximum blob size (M): "
                     + ((float) info.maxBlobSize / 1024. / 1024.) + " in "
                     + info.maxBlobSizePath);
         }
-        System.out.println("Folders");
-        System.out.println("   Maximum depth: " + info.maxDepth + " in "
+        log.info("Folders");
+        log.info("   Maximum depth: " + info.maxDepth + " in "
                 + info.maxDepthPath);
-        System.out.println("   Maximum children: " + info.maxChildren + " in "
+        log.info("   Maximum children: " + info.maxChildren + " in "
                 + info.maxChildrenPath);
 
         long t1 = System.currentTimeMillis();
-        System.out.println("Repository performance during stats was " + 1000
+        log.info("Repository performance during stats was " + 1000
                 * ((float) info.getTotalNbDocs()) / (t1 - t0) + " doc/s");
     }
 
