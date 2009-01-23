@@ -20,9 +20,7 @@
 package org.nuxeo.ecm.shell.commands.repository;
 
 import java.io.File;
-import java.text.SimpleDateFormat;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -39,9 +37,6 @@ import org.nuxeo.runtime.services.streaming.StreamSource;
 public class ThreadedImportTask implements Runnable {
 
     private static final Log log = LogFactory.getLog(ThreadedImportTask.class);
-
-    private static final SimpleDateFormat LOGDATEFORMAT = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
 
     private static int taskCounter = 0;
 
@@ -103,7 +98,7 @@ public class ThreadedImportTask implements Runnable {
     protected void commit(boolean force) throws Exception {
         uploadedFiles++;
         if (uploadedFiles % 10 == 0) {
-            // fslog(uploadedFiles + " doc created ...[" +
+            // log.info(uploadedFiles + " doc created ...[" +
             // Thread.currentThread().getName() + "]");
             MTFSImportCommand.addCreatedDoc(taskId, uploadedFiles);
         }
