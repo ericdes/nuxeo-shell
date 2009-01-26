@@ -53,12 +53,8 @@ public class CommandContext extends HashMap<String, Object> {
     private CommandLine cmdLine;
 
     private RepositoryInstance repository;
-<<<<<<< local
-    private final CommandLineService service;
-=======
 
-    private CommandLineService service;
->>>>>>> other
+    private final CommandLineService service;
 
     private Collection<String> candidateHosts;
 
@@ -225,8 +221,8 @@ public class CommandContext extends HashMap<String, Object> {
                         password));
             }
             try {
-                log.info("Trying to connect to nuxeo server at " + h
-                        + ':' + port + " as "
+                log.info("Trying to connect to nuxeo server at " + h + ':'
+                        + port + " as "
                         + (username == null ? "system user" : username) + "...");
                 client.connect(h, port);
                 setHost(h);
