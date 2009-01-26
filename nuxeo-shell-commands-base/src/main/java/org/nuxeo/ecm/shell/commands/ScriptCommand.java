@@ -30,6 +30,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.shell.Command;
 import org.nuxeo.ecm.shell.CommandLine;
 import org.nuxeo.runtime.api.Framework;
@@ -37,6 +39,7 @@ import org.nuxeo.runtime.scripting.ScriptingService;
 
 /** @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a> */
 public class ScriptCommand implements Command {
+    private static final Log log = LogFactory.getLog(ScriptCommand.class);
 
     public void printHelp(PrintStream out) {
         // TODO Auto-generated method stub
@@ -46,9 +49,8 @@ public class ScriptCommand implements Command {
 
         String file = cmdLine.getOption("file");
         if (file == null) {
-            //TODO: support for std input stream not yet impl
-            System.err.println(
-                    "STDIN support not yet implemented. Neither stdin supported, neither any file given as input => aborting ... sorry :)");
+            // TODO: support for std input stream not yet impl
+            log.error("STDIN support not yet implemented. Neither stdin supported, neither any file given as input => aborting ... sorry :)");
             System.exit(10);
         }
 
@@ -64,8 +66,7 @@ public class ScriptCommand implements Command {
         try {
             ss = Framework.getLocalService(ScriptingService.class);
         } catch (Exception e) {
-            System.err.println(
-                    "Scripting is not enabled. To enable it copy the nuxeo-runtime-scripting bundle in app/bundles");
+            log.error("Scripting is not enabled. To enable it copy the nuxeo-runtime-scripting bundle in app/bundles");
             System.exit(10);
         }
 

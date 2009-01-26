@@ -19,17 +19,20 @@
 
 package org.nuxeo.ecm.shell.commands;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.shell.Command;
 import org.nuxeo.ecm.shell.CommandLine;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public class DebugCommand implements Command {
+    private static final Log log = LogFactory.getLog(DebugCommand.class);
 
     public void run(CommandLine cmdLine) throws Exception {
-        System.out.println(cmdLine);
+        log.debug(cmdLine);
     }
 
 }

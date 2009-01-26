@@ -20,6 +20,8 @@ package org.nuxeo.ecm.shell.commands.system;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.shell.CommandLine;
 import org.nuxeo.ecm.shell.commands.repository.AbstractCommand;
 import org.nuxeo.runtime.RuntimeService;
@@ -28,22 +30,22 @@ import org.nuxeo.runtime.model.RegistrationInfo;
 
 /**
  * @author <a href="mailto:sf@nuxeo.com">Stefane Fermigier</a>
- *
+ * 
  */
 public class ServicesCommand extends AbstractCommand {
+    private static final Log log = LogFactory.getLog(ServicesCommand.class);
 
     @Override
     public void run(CommandLine cmdLine) throws Exception {
         RuntimeService runtime = Framework.getRuntime();
-        System.out.println(runtime.toString());
+        log.info(runtime.toString());
 
         List<RegistrationInfo> ris = util.listRegistrationInfos();
 
-        System.out.println("Registered components (+ state)");
+        log.info("Registered components (+ state)");
         for (RegistrationInfo ri : ris) {
-            System.out.println(ri.getName() + ": " + ri.getState());
+            log.info(ri.getName() + ": " + ri.getState());
         }
     }
 
 }
-

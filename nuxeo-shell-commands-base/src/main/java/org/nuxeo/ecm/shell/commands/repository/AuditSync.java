@@ -19,6 +19,8 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.common.utils.Path;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.platform.audit.api.Logs;
@@ -26,7 +28,7 @@ import org.nuxeo.ecm.shell.CommandLine;
 import org.nuxeo.runtime.api.Framework;
 
 public class AuditSync extends AbstractCommand {
-
+    private static final Log log = LogFactory.getLog(AuditSync.class);
     private void printHelp() {
         System.out.println("");
         System.out.println("Syntax: auditsync remote_path [clientResursionLevel] ");
@@ -45,7 +47,7 @@ public class AuditSync extends AbstractCommand {
         String[] elements = cmdLine.getParameters();
 
         if (elements.length == 0) {
-            System.out.println(
+            log.error(
                     "SYNTAX ERROR: the audit command must take at least one argument: auditsync remote_path");
             printHelp();
             return;
@@ -59,7 +61,7 @@ public class AuditSync extends AbstractCommand {
         try {
             root = context.fetchDocument(path);
         } catch (Exception e) {
-            System.err.println("Failed to retrieve the given folder");
+            log.error("Failed to retrieve the given folder",e);
             return;
         }
 
@@ -68,7 +70,7 @@ public class AuditSync extends AbstractCommand {
             try {
                 clientRecurseLevel = Integer.parseInt(elements[1]);
             } catch (Throwable t) {
-                System.err.println("Failed to parse clientRecurseLevel parameter");
+                log.error("Failed to parse clientRecurseLevel parameter",t);
                 return;
             }
         }
@@ -89,8 +91,8 @@ public class AuditSync extends AbstractCommand {
                     0, clientRecurseLevel);
         }
         long t1 = System.currentTimeMillis();
-        System.out.println(nbEntries + " audit entries synched in " + (t1 - t0) + "ms");
-        System.out.println(1000 * (float) nbEntries / (t1 - t0) + " doc/s");
+        log.info(nbEntries + " audit entries synched in " + (t1 - t0) + "ms");
+        log.info(1000 * (float) nbEntries / (t1 - t0) + " doc/s");
     }
 
     private long recurseSyncLog(String repo, DocumentModel root, int level,
@@ -101,7 +103,7 @@ public class AuditSync extends AbstractCommand {
             long nbEntries = auditService.syncLogCreationEntries(repo,
                     root.getPathAsString(), true);
             long ti2 = System.currentTimeMillis();
-            System.out.println("Level " + level + " : " + nbEntries
+            log.info("Level " + level + " : " + nbEntries
                     + " audit entries synched in " + (ti2 - ti1) + "ms");
             return nbEntries;
         } else {

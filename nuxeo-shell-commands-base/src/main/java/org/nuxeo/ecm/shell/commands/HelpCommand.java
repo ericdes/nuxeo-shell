@@ -23,6 +23,8 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.common.utils.StringUtils;
 import org.nuxeo.ecm.shell.Command;
 import org.nuxeo.ecm.shell.CommandDescriptor;
@@ -33,9 +35,10 @@ import org.nuxeo.runtime.api.Framework;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public class HelpCommand implements Command {
+    private static final Log log = LogFactory.getLog(HelpCommand.class);
 
     private CommandLineService service;
 
@@ -50,7 +53,7 @@ public class HelpCommand implements Command {
     }
 
     void printHelp(PrintStream out, String help, String ident) {
-        for (String line: trimHelpLines(help)) {
+        for (String line : trimHelpLines(help)) {
             out.println(ident + line);
         }
     }
@@ -60,15 +63,14 @@ public class HelpCommand implements Command {
         out.println();
         out.println("The following commands are supported:");
         for (CommandDescriptor cd : service.getSortedCommands()) {
-            out.println(" * " + cd.getName() + " - "
-                    + cd.getDescription());
+            out.println(" * " + cd.getName() + " - " + cd.getDescription());
         }
         out.println();
         out.println("Global options: ");
         for (CommandOption opt : service.getCommandOptions()) {
             if (opt.getCommand() == null) { // ignore local options
                 String help = opt.getHelp();
-                if (help !=null && help.length() > 0) {
+                if (help != null && help.length() > 0) {
                     String msg = "  --" + opt.getName();
                     if (opt.getShortcut() != null) {
                         msg += " [shortcut: -" + opt.getShortcut() + ']';
@@ -87,16 +89,16 @@ public class HelpCommand implements Command {
     public void printCommandHelp(String cmd, PrintStream out) {
         CommandDescriptor cd = service.getCommand(cmd);
         if (cd == null) {
-            System.err.println("Unknown command: "+cmd);
+            log.error("Unknown command: " + cmd);
             return;
         }
         try {
             cd.newInstance(); // make sure command definition is loaded
-        } catch (Exception  e) {
+        } catch (Exception e) {
             // do nothing
         }
         // header
-        out.println("Command: "+cd.getName()+" - "+cd.getDescription());
+        out.println("Command: " + cd.getName() + " - " + cd.getDescription());
         out.println();
         // aliases
         out.print("Aliases: ");
@@ -104,7 +106,7 @@ public class HelpCommand implements Command {
         if (aliases == null || aliases.length == 0) {
             out.println("N/A");
         } else {
-           out.println(StringUtils.join(aliases, ", "));
+            out.println(StringUtils.join(aliases, ", "));
         }
         out.println();
         // options
@@ -114,7 +116,7 @@ public class HelpCommand implements Command {
         } else {
             for (CommandOption opt : cd.getOptions()) {
                 String help = opt.getHelp();
-                if (help !=null && help.length() > 0) {
+                if (help != null && help.length() > 0) {
                     String msg = "  --" + opt.getName();
                     if (opt.getShortcut() != null) {
                         msg += " [shortcut: -" + opt.getShortcut() + ']';
@@ -134,9 +136,9 @@ public class HelpCommand implements Command {
         String[] rawLines = help.split("\n|(\r\n)|\r");
         List<String> lines = new ArrayList<String>();
 
-        //trim empty lines
+        // trim empty lines
         int start = 0;
-        for (int i=0; i<rawLines.length; i++) {
+        for (int i = 0; i < rawLines.length; i++) {
             start = i;
             String line = rawLines[i].trim();
             if (line.length() > 0) {
@@ -144,7 +146,7 @@ public class HelpCommand implements Command {
             }
         }
         int end = 0;
-        for (int i=rawLines.length-1; i>=0; i--) {
+        for (int i = rawLines.length - 1; i >= 0; i--) {
             end = i;
             String line = rawLines[i].trim();
             if (line.length() > 0) {
@@ -152,8 +154,8 @@ public class HelpCommand implements Command {
             }
         }
 
-        //trim lines content and add to list
-        for (int i=start; i<=end; i++) {
+        // trim lines content and add to list
+        for (int i = start; i <= end; i++) {
             lines.add(rawLines[i].trim());
         }
 

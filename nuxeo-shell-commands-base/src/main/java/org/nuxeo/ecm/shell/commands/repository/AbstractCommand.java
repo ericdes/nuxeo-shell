@@ -19,6 +19,8 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.ecm.shell.Command;
 import org.nuxeo.ecm.shell.CommandContext;
@@ -28,12 +30,16 @@ import org.nuxeo.runtime.api.Framework;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public abstract class AbstractCommand implements Command {
 
+    private static final Log log = LogFactory.getLog(AbstractCommand.class);
+
     protected final NuxeoClient client = NuxeoClient.getInstance();
+
     protected CommandLineService cmdService;
+
     protected CommandContext context;
 
     protected AbstractCommand() {
@@ -41,7 +47,7 @@ public abstract class AbstractCommand implements Command {
             cmdService = Framework.getLocalService(CommandLineService.class);
             context = cmdService.getCommandContext();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e);
         }
     }
 

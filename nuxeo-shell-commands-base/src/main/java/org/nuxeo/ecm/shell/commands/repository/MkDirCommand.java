@@ -19,6 +19,8 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.common.utils.Path;
 import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -26,13 +28,13 @@ import org.nuxeo.ecm.core.api.DocumentRef;
 import org.nuxeo.ecm.shell.CommandLine;
 
 public class MkDirCommand extends AbstractCommand {
+    private static final Log log = LogFactory.getLog(MkDirCommand.class);
 
     @Override
     public void run(CommandLine cmdLine) throws Exception {
         String[] elements = cmdLine.getParameters();
         if (elements.length == 0) {
-            System.out.println(
-                    "SYNTAX ERROR: the mkdir command must take at least one argument: mkdir path_or_name [type]");
+            log.error("SYNTAX ERROR: the mkdir command must take at least one argument: mkdir path_or_name [type]");
             return;
         }
         DocumentModel parent = null;

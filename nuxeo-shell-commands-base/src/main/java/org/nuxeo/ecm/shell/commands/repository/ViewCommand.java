@@ -22,6 +22,8 @@ package org.nuxeo.ecm.shell.commands.repository;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.common.utils.Path;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.shell.CommandLine;
@@ -31,6 +33,7 @@ import org.nuxeo.ecm.shell.CommandLine;
  *
  */
 public class ViewCommand extends AbstractCommand {
+    private static final Log log = LogFactory.getLog(ViewCommand.class);
 
     @Override
     public void run(CommandLine cmdLine) throws Exception {
@@ -41,7 +44,7 @@ public class ViewCommand extends AbstractCommand {
             try {
                 doc = context.fetchDocument(path);
             } catch (Exception e) {
-                System.err.println("Failed to retrieve the given folder");
+                log.error("Failed to retrieve the given folder",e);
                 return;
             }
         } else {
@@ -52,18 +55,18 @@ public class ViewCommand extends AbstractCommand {
         Date ctime = cal == null ? null : cal.getTime();
         cal = (Calendar)doc.getProperty("dublincore", "modified");
         Date mtime = cal == null ? null : cal.getTime();
-        System.out.println("--------------------------------------------------------------------");
-        System.out.println("UID: "+doc.getId());
-        System.out.println("Path: "+doc.getPathAsString());
-        System.out.println("Type: "+doc.getType());
-        System.out.println("--------------------------------------------------------------------");
-        System.out.println("Title: "+doc.getTitle());
-        System.out.println("Author: "+doc.getProperty("dublincore", "creator"));
-        System.out.println("Created: "+ctime);
-        System.out.println("Last Modified: "+mtime);
-        System.out.println("--------------------------------------------------------------------");
-        System.out.println("Description: "+doc.getTitle());
-        System.out.println("--------------------------------------------------------------------");
+        log.info("--------------------------------------------------------------------");
+        log.info("UID: "+doc.getId());
+        log.info("Path: "+doc.getPathAsString());
+        log.info("Type: "+doc.getType());
+        log.info("--------------------------------------------------------------------");
+        log.info("Title: "+doc.getTitle());
+        log.info("Author: "+doc.getProperty("dublincore", "creator"));
+        log.info("Created: "+ctime);
+        log.info("Last Modified: "+mtime);
+        log.info("--------------------------------------------------------------------");
+        log.info("Description: "+doc.getTitle());
+        log.info("--------------------------------------------------------------------");
     }
 
 }

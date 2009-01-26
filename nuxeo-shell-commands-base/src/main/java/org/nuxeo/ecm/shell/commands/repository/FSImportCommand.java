@@ -20,12 +20,7 @@
 package org.nuxeo.ecm.shell.commands.repository;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -46,20 +41,13 @@ import org.nuxeo.runtime.services.streaming.StreamSource;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public class FSImportCommand extends AbstractCommand {
 
     private static final int MAX_IDX_BATCH_SIZE = 50;
 
-    private static final Log log = LogFactory.getLog(FSImportCommand.class);
-
-    private static final File logFile = new File("import.log");
-
-    private static FileOutputStream logFileOut;
-
-    private static final SimpleDateFormat LOGDATEFORMAT = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
+    protected static final Log log = LogFactory.getLog(FSImportCommand.class);
 
     private static final String NO_JMS_OPTION = "no-jms";
 
@@ -70,33 +58,6 @@ public class FSImportCommand extends AbstractCommand {
     private static final String FULL_INDEXING = "full-indexing";
 
     private static final long RECYCLE_CORE_SESSION_INTERVAL = 100;
-
-    private static void fslog(String msg) {
-        fslog(msg, false);
-    }
-
-    // This should be done with log4j but I did not find a way to configure it
-    // the way I wanted ...
-    private static void fslog(String msg, boolean debug) {
-        log.info(msg);
-
-        try {
-            if (logFileOut == null) {
-
-                logFile.createNewFile();
-                logFileOut = new FileOutputStream(logFile);
-            }
-            String strMessage = LOGDATEFORMAT.format(new Date()) + " -- " + msg
-                    + "\n";
-            logFileOut.write(strMessage.getBytes());
-        } catch (IOException e) {
-            log.error("Unaable to log in file ", e);
-        }
-
-        if (!debug) {
-            System.out.println(msg);
-        }
-    }
 
     private void printHelp() {
         System.out.println("");
@@ -122,7 +83,7 @@ public class FSImportCommand extends AbstractCommand {
 
         String[] elements = cmdLine.getParameters();
         if (elements.length == 0) {
-            System.out.println("SYNTAX ERROR: the fsimport command must take at least one argument: fsimport local_file_path [remote_path] [batch_size] ");
+            log.error("SYNTAX ERROR: the fsimport command must take at least one argument: fsimport local_file_path [remote_path] [batch_size] ");
             printHelp();
             return;
         }
@@ -139,7 +100,7 @@ public class FSImportCommand extends AbstractCommand {
             try {
                 parent = context.fetchDocument(path);
             } catch (Exception e) {
-                System.err.println("Failed to retrieve the given folder");
+                log.error("Failed to retrieve the given folder", e);
                 return;
             }
         } else {
@@ -151,8 +112,10 @@ public class FSImportCommand extends AbstractCommand {
             try {
                 batchSize = Integer.parseInt(elements[2]);
             } catch (Throwable t) {
-                System.err.println("Failed to parse batch size, using default");
                 batchSize = 10;
+                log.error(
+                        "Failed to parse batch size, using default batchSize="
+                                + batchSize, t);
             }
         }
 
@@ -167,17 +130,17 @@ public class FSImportCommand extends AbstractCommand {
         if (ONLY_CORE.equals(optim)) {
             blockJMS = true;
             blockSyncIndexing = true;
-            fslog("JMS and Sync indexing will be desactivated during this import");
+            log.info("JMS and Sync indexing will be desactivated during this import");
         } else if (NO_SYNC_IDX_OPTION.equals(optim)) {
             blockJMS = false;
             blockSyncIndexing = true;
-            fslog("Sync indexing will be desactivated for during import");
+            log.info("Sync indexing will be desactivated for during import");
         } else if (NO_JMS_OPTION.equals(optim)) {
             blockJMS = true;
             blockSyncIndexing = false;
-            fslog("JMS forwarding will be desactivated for during import");
+            log.info("JMS forwarding will be desactivated for during import");
         } else {
-            fslog("Sync indexing abd JMS forwarding will be activated for during import");
+            log.info("Sync indexing abd JMS forwarding will be activated for during import");
         }
 
         RepositoryInstance repo = context.getRepositoryInstance();
@@ -186,7 +149,7 @@ public class FSImportCommand extends AbstractCommand {
                 blockSyncIndexing);
         task.setInputFile(localFile);
         task.setTargetFolder(parent);
-        fslog("Starting import task");
+        log.info("Starting import task");
         task.run();
     }
 
@@ -198,7 +161,7 @@ public class FSImportCommand extends AbstractCommand {
 
     /**
      * A worker is importing a sub-tree
-     *
+     * 
      * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
      */
     protected class ImportTask implements Runnable {
@@ -227,8 +190,8 @@ public class FSImportCommand extends AbstractCommand {
 
         Boolean blockSyncIndexing = false;
 
-        protected ImportTask(CoreSession session, int batchSize, Boolean blockJMS,
-                Boolean blockSyncIndexing) {
+        protected ImportTask(CoreSession session, int batchSize,
+                Boolean blockJMS, Boolean blockSyncIndexing) {
             this(session, batchSize);
             this.blockJMS = blockJMS;
             this.blockSyncIndexing = blockSyncIndexing;
@@ -257,16 +220,13 @@ public class FSImportCommand extends AbstractCommand {
             uploadedFiles++;
             long tcomit = System.currentTimeMillis();
             if (uploadedFiles % 10 == 0) {
-                fslog(uploadedFiles + " doc created ...");
+                log.info(uploadedFiles + " doc created ...");
             }
             if (uploadedFiles % batchSize == 0) {
-                fslog(
-                        "Comiting Core Session after " + uploadedFiles
-                                + " files", true);
-                fslog(uploadedFiles / ((tcomit - t0) / 1000.0)
-                        + " doc/s", true);
-                fslog(uploadedKO / ((tcomit - t0) / 1000.0) + " KB/s",
-                        true);
+                log.debug("Comiting Core Session after " + uploadedFiles
+                        + " files");
+                log.debug(uploadedFiles / ((tcomit - t0) / 1000.0) + " doc/s");
+                log.debug(uploadedKO / ((tcomit - t0) / 1000.0) + " KB/s");
                 session.save();
                 commits += 1;
 
@@ -277,7 +237,7 @@ public class FSImportCommand extends AbstractCommand {
         }
 
         protected void recyleCoreSession() throws Exception {
-            fslog("Recycling core session ", true);
+            log.debug("Recycling core session ");
             String repoName = session.getRepositoryName();
             session.disconnect();
             session = NuxeoClient.getInstance().openRepository(repoName);
@@ -287,7 +247,7 @@ public class FSImportCommand extends AbstractCommand {
                 throws Exception {
             String name = getValidNameFromFileName(file.getName());
 
-            Map<String,Object> options = new HashMap<String, Object>();
+            Map<String, Object> options = new HashMap<String, Object>();
             options.put("BLOCK_JMS_PRODUCING", true);
             String docType = "Folder";
             DocumentModel doc = session.createDocumentModel(docType, options);
@@ -300,9 +260,8 @@ public class FSImportCommand extends AbstractCommand {
                 doc.putContextData("BLOCK_SYNC_INDEXING", true);
             }
             // doc = session.saveDocument(doc);
-            fslog(
-                    "Creating Folder " + name + " at "
-                            + parent.getPathAsString(), true);
+            log.debug("Creating Folder " + name + " at "
+                    + parent.getPathAsString());
             doc = session.createDocument(doc);
             // save session if needed
             commit();
@@ -312,7 +271,7 @@ public class FSImportCommand extends AbstractCommand {
         public DocumentModel createFile(DocumentModel parent, File file)
                 throws Exception {
             if (!file.exists()) {
-                fslog("non readable file: " + file.getName());
+                log.warn("non readable file: " + file.getName());
                 return null;
             }
             String mimeType = getMimeType(file);
@@ -320,7 +279,7 @@ public class FSImportCommand extends AbstractCommand {
             String name = getValidNameFromFileName(file.getName());
             String fileName = file.getName();
 
-            Map<String,Object> options = new HashMap<String, Object>();
+            Map<String, Object> options = new HashMap<String, Object>();
             options.put("BLOCK_JMS_PRODUCING", true);
             DocumentModel doc = session.createDocumentModel(docType, options);
             if (blockJMS) {
@@ -341,9 +300,9 @@ public class FSImportCommand extends AbstractCommand {
             doc.setProperty("file", "content", streamingBlob);
             // doc = session.saveDocument(doc);
             long kbSize = file.length() / 1024;
-            fslog("Creating doc " + name + " at " + parent.getPathAsString()
-                    + " with file " + fileName + " of size " + kbSize + "KB",
-                    true);
+            log.debug("Creating doc " + name + " at "
+                    + parent.getPathAsString() + " with file " + fileName
+                    + " of size " + kbSize + "KB");
             doc = session.createDocument(doc);
 
             uploadedKO += kbSize;
@@ -382,8 +341,9 @@ public class FSImportCommand extends AbstractCommand {
         }
 
         /**
-         * TODO: Modify this to get right mime types depending on the file input.
-         *
+         * TODO: Modify this to get right mime types depending on the file
+         * input.
+         * 
          * @param file
          * @return
          */
@@ -454,63 +414,63 @@ public class FSImportCommand extends AbstractCommand {
                         indexingBatchSize = batchSize;
                     }
                     searchService.setIndexingDocBatchSize(indexingBatchSize);
-                    fslog("Setting indexing batch size to "
+                    log.info("Setting indexing batch size to "
                             + searchService.getIndexingDocBatchSize());
-                    fslog("Indexing thread pool size = "
+                    log.info("Indexing thread pool size = "
                             + searchService.getNumberOfIndexingThreads());
 
                     initialCompletedIndexingTasks = searchService.getTotalCompletedIndexingTasks();
-                    fslog("already completed indexing tasks= "
-                            + initialCompletedIndexingTasks, true);
+                    log.debug("Already completed indexing tasks= "
+                            + initialCompletedIndexingTasks);
                     if (searchService.getActiveIndexingTasks() > 0) {
-                        log.warn("Warning indexing queue is not empty ");
+                        log.warn("Indexing queue is not empty ");
                     }
 
                 }
 
                 if (blockJMS) {
-                    fslog("JMS event production is disabled ");
+                    log.info("JMS event production is disabled ");
                 }
                 if (blockSyncIndexing) {
-                    fslog("Synchronous indexing is disabled");
+                    log.info("Synchronous indexing is disabled");
                 }
 
                 upload(rootDoc, rootFile);
                 session.save();
-                fslog("doc upload terminated");
+                log.info("doc upload terminated");
                 if (searchService != null) {
-                    fslog("sync indexing terminated");
+                    log.info("sync indexing terminated");
                 }
                 long t1 = System.currentTimeMillis();
                 // Thread.sleep(2000);
-                fslog(uploadedFiles + " doc created in " + (t1 - t0) + "ms");
-                fslog(uploadedFiles / ((t1 - t0) / 1000.0) + " doc/s");
-                fslog(uploadedKO / ((t1 - t0) / 1000.0) + " KB/s");
+                log.info(uploadedFiles + " doc created in " + (t1 - t0) + "ms");
+                log.info(uploadedFiles / ((t1 - t0) / 1000.0) + " doc/s");
+                log.info(uploadedKO / ((t1 - t0) / 1000.0) + " KB/s");
                 if (searchService != null) {
-                    fslog("waiting for asynchronous indexing to finish");
+                    log.info("waiting for asynchronous indexing to finish");
                     while (searchService.getActiveIndexingTasks() > 0) {
                         Thread.sleep(2500);
                         long completedTasks = searchService.getTotalCompletedIndexingTasks();
-                        fslog("completed indexing tasks= " + completedTasks,
-                                true);
+                        log.debug("completed indexing tasks= " + completedTasks);
 
                         long nbIndexedDocs = searchService.getTotalCompletedIndexingTasks()
                                 - initialCompletedIndexingTasks;
                         long indexToGo = uploadedFiles - nbIndexedDocs;
                         if (indexToGo > 0) {
-                            fslog(nbIndexedDocs + " doc indexed (" + indexToGo
-                                    + " to go ... )");
+                            log.info(nbIndexedDocs + " doc indexed ("
+                                    + indexToGo + " to go ... )");
                         } else {
-                            fslog(nbIndexedDocs
+                            log.info(nbIndexedDocs
                                     + " doc indexed (processing additionnal reindex JMS events)");
                         }
                         // adaptBatchSize(indexToGo, searchService);
                     }
 
                     long t2 = System.currentTimeMillis();
-                    fslog("Async indexing completed");
-                    fslog(uploadedFiles + " doc indexed in " + (t2 - t0) + "ms");
-                    fslog(uploadedFiles / ((double) ((t2 - t0) / 1000))
+                    log.info("Async indexing completed");
+                    log.info(uploadedFiles + " doc indexed in " + (t2 - t0)
+                            + "ms");
+                    log.info(uploadedFiles / ((double) ((t2 - t0) / 1000))
                             + " doc/s");
                     searchService.setIndexingDocBatchSize(oldBatchSize);
                 }
@@ -537,7 +497,7 @@ public class FSImportCommand extends AbstractCommand {
             try {
                 CoreInstance.getInstance().close(session);
             } catch (Exception e) {
-                e.printStackTrace();// TODO
+                log.error(e);
             }
         }
     }

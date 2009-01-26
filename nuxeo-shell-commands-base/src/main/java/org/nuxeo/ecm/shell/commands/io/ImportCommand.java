@@ -21,6 +21,8 @@ package org.nuxeo.ecm.shell.commands.io;
 
 import java.io.File;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.ecm.core.io.DocumentPipe;
@@ -35,18 +37,20 @@ import org.nuxeo.ecm.shell.CommandLine;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public class ImportCommand implements Command {
+    private static final Log log = LogFactory.getLog(ImportCommand.class);
 
     private final NuxeoClient client = NuxeoClient.getInstance();
+
     private RepositoryInstance repository;
 
     public void run(CommandLine cmdLine) throws Exception {
         String[] elements = cmdLine.getParameters();
         // parse cmd line
         if (elements.length != 2) {
-            System.err.println("Usage : import src dest");
+            log.error("Usage : import src dest");
             return;
         }
         String path = elements[1];
@@ -75,7 +79,7 @@ public class ImportCommand implements Command {
             writer = new DocumentModelWriter(repository, toPath, 10);
 
             DocumentPipe pipe = new DocumentPipeImpl(10);
-            //pipe.addTransformer(transformer);
+            // pipe.addTransformer(transformer);
             pipe.setReader(reader);
             pipe.setWriter(writer);
             pipe.run();
@@ -96,12 +100,12 @@ public class ImportCommand implements Command {
             toPath = "/";
         }
         if (file == null) {
-            System.err.println("Command Syntax Error. See help page");
+            log.error("Command Syntax Error. See help page");
             return;
         }
 
         if (!file.exists()) {
-            System.err.println("File not found: "+file);
+            log.error("File not found: " + file);
             return;
         }
 
@@ -112,7 +116,7 @@ public class ImportCommand implements Command {
             writer = new DocumentModelUpdater(repository, toPath, 10);
 
             DocumentPipe pipe = new DocumentPipeImpl(10);
-            //pipe.addTransformer(transformer);
+            // pipe.addTransformer(transformer);
             pipe.setReader(reader);
             pipe.setWriter(writer);
             pipe.run();

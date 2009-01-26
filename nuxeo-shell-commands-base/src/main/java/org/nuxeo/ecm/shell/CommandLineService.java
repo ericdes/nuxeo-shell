@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.common.Environment;
 import org.nuxeo.ecm.shell.commands.scripting.ScriptingCommandDescriptor;
 import org.nuxeo.osgi.application.StandaloneApplication;
@@ -41,19 +43,23 @@ import org.osgi.framework.FrameworkListener;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
-public class CommandLineService extends DefaultComponent implements FrameworkListener {
+public class CommandLineService extends DefaultComponent implements
+        FrameworkListener {
+
+    private static final Log log = LogFactory.getLog(CommandLineService.class);
 
     public static final ComponentName NAME = new ComponentName(
             "org.nuxeo.runtime.client.CommandLineService");
 
     private Map<String, CommandDescriptor> cmds;
+
     private Map<String, CommandOption> options;
+
     private Map<String, CommandOption> shortcuts;
 
     CommandContext commandContext;
-
 
     @Override
     public void activate(ComponentContext context) throws Exception {
@@ -61,7 +67,8 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         options = new Hashtable<String, CommandOption>();
         shortcuts = new Hashtable<String, CommandOption>();
         commandContext = new CommandContext(this);
-        context.getRuntimeContext().getBundle().getBundleContext().addFrameworkListener(this);
+        context.getRuntimeContext().getBundle().getBundleContext().addFrameworkListener(
+                this);
 
         // register activate script commands
         reload();
@@ -86,7 +93,8 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
 
     @Override
     public void deactivate(ComponentContext context) throws Exception {
-        context.getRuntimeContext().getBundle().getBundleContext().removeFrameworkListener(this);
+        context.getRuntimeContext().getBundle().getBundleContext().removeFrameworkListener(
+                this);
         cmds.clear();
         options.clear();
         shortcuts.clear();
@@ -94,14 +102,14 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         options = null;
         shortcuts = null;
         commandContext = null;
-        //System.out.println("Exiting");
+        // log.debug("Exiting");
     }
 
     @Override
     public void registerContribution(Object contribution,
             String extensionPoint, ComponentInstance contributor) {
         if (extensionPoint.equals("commands")) {
-            CommandDescriptor cmd = (CommandDescriptor)contribution;
+            CommandDescriptor cmd = (CommandDescriptor) contribution;
             String name = cmd.getName();
             cmds.put(name, cmd);
             CommandOption[] opts = cmd.getOptions();
@@ -112,7 +120,7 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
                 }
             }
         } else if (extensionPoint.equals("options")) {
-            CommandOption arg = (CommandOption)contribution;
+            CommandOption arg = (CommandOption) contribution;
             addCommandOption(arg);
         }
     }
@@ -121,7 +129,7 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
     public void unregisterContribution(Object contribution,
             String extensionPoint, ComponentInstance contributor) {
         if (extensionPoint.equals("commands")) {
-            CommandDescriptor cmd = (CommandDescriptor)contribution;
+            CommandDescriptor cmd = (CommandDescriptor) contribution;
             cmds.remove(cmd.getName());
             CommandOption[] opts = cmd.getOptions();
             if (opts != null) { // unregister local options
@@ -130,7 +138,7 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
                 }
             }
         } else if (extensionPoint.equals("options")) {
-            CommandOption arg = (CommandOption)contribution;
+            CommandOption arg = (CommandOption) contribution;
             removeCommandOption(arg);
         }
     }
@@ -199,13 +207,15 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         return commandContext;
     }
 
-    public CommandLine parse(String[] args, boolean validate) throws ParseException {
+    public CommandLine parse(String[] args, boolean validate)
+            throws ParseException {
         Queue<CommandOption> queue = new LinkedList<CommandOption>();
         CommandLine cmdLine = new CommandLine(this);
         if (args.length == 0) {
             return cmdLine;
         }
-        // skip any option before command name - these may be used by the launcher
+        // skip any option before command name - these may be used by the
+        // launcher
         int k = 0;
         for (String arg : args) {
             if (!arg.startsWith("-")) {
@@ -217,14 +227,15 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         // now parse the remaining arguments
         cmdLine.addCommand(args[k]);
         // if this is a dynamic script command we disable "validate" because
-        // scripts may not declare the metadata() function that describe the command
+        // scripts may not declare the metadata() function that describe the
+        // command
         if (validate) {
             CommandDescriptor cmd = getCommand(cmdLine.getCommand());
             if (cmd != null && cmd.isDynamicScript()) {
                 validate = false;
             }
         }
-        for (int i = k+1; i < args.length; i++) {
+        for (int i = k + 1; i < args.length; i++) {
             String arg = args[i];
             CommandOption opt;
             if (arg.startsWith("-")) {
@@ -233,7 +244,8 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
                     opt = options.get(arg);
                     if (opt == null) {
                         if (validate) {
-                            throw new ParseException("Option is not recognized: "+arg, 0);
+                            throw new ParseException(
+                                    "Option is not recognized: " + arg, 0);
                         } else {
                             continue;
                         }
@@ -249,7 +261,8 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
                         opt = shortcuts.get(String.valueOf(c));
                         if (opt == null) {
                             if (validate) {
-                                throw new ParseException("Option is not recognized: "+c, 0);
+                                throw new ParseException(
+                                        "Option is not recognized: " + c, 0);
                             } else {
                                 continue; // ignore this option
                             }
@@ -271,24 +284,26 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         }
 
         // validate cmd args
-
         if (validate) {
             if (!queue.isEmpty()) {
-                System.out.println("Syntax error. The following options had no values:");
+                StringBuffer logMsg = new StringBuffer();
+                logMsg.append("Syntax error. The following options had no values:");
                 while (!queue.isEmpty()) {
-                    System.out.println(" * " + queue.poll());
+                    logMsg.append(" * " + queue.poll());
                 }
+                log.info(logMsg);
             }
 
-//          // first check all required options
-//          for (CommandOption op :  this.options.values()) {
-//              if (op.isRequired && !cmdLine.containsKey(op.name)) {
-//                  System.out.println("Required option is missing: "+op.name);
-//                  System.exit(2);
-//              }
-//          }
+            // // first check all required options
+            // for (CommandOption op : this.options.values()) {
+            // if (op.isRequired && !cmdLine.containsKey(op.name)) {
+            // log.error("Required option is missing: "+op.name);
+            // System.exit(2);
+            // }
+            // }
 
-        } else { // when not validating, we need to insert all pending option into the command line (needed for autcompletion to work)
+        } else { // when not validating, we need to insert all pending option
+            // into the command line (needed for auto-completion to work)
             if (!queue.isEmpty()) {
                 while (!queue.isEmpty()) {
                     CommandOption opt = queue.poll();
@@ -300,7 +315,8 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         return cmdLine;
     }
 
-    public void runCommand(CommandDescriptor cd, CommandLine cmdLine) throws Exception {
+    public void runCommand(CommandDescriptor cd, CommandLine cmdLine)
+            throws Exception {
         Command command = cd.newInstance();
         command.run(cmdLine);
     }
@@ -309,23 +325,22 @@ public class CommandLineService extends DefaultComponent implements FrameworkLis
         if (event.getType() == FrameworkEvent.STARTED) {
             Environment env = Environment.getDefault();
             if (env == null) {
-                System.err.println(
-                        "Could not start command line service. This service works only with nxshell launcher");
+                log.error("Could not start command line service. This service works only with nxshell launcher");
                 return;
             }
             String[] args = env.getCommandLineArguments();
             int k = -1;
             // search for the "-exec" option
-            for (int i=0; i<args.length; i++) {
+            for (int i = 0; i < args.length; i++) {
                 if (args[i].equals("-console")) {
-                    k = i+1;
+                    k = i + 1;
                     break;
                 }
             }
             if (k == -1) {
                 return; // do not activate the console
             }
-            final String[] newArgs = new String[args.length-k];
+            final String[] newArgs = new String[args.length - k];
             if (newArgs.length > 0) {
                 System.arraycopy(args, k, newArgs, 0, newArgs.length);
             }

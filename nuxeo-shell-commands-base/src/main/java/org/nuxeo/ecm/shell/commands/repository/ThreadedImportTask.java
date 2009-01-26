@@ -20,12 +20,7 @@
 package org.nuxeo.ecm.shell.commands.repository;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -43,9 +38,6 @@ public class ThreadedImportTask implements Runnable {
 
     private static final Log log = LogFactory.getLog(ThreadedImportTask.class);
 
-    private static final SimpleDateFormat LOGDATEFORMAT = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
-
     private static int taskCounter = 0;
 
     private boolean isRunning = false;
@@ -61,10 +53,6 @@ public class ThreadedImportTask implements Runnable {
     private DocumentModel rootDoc;
 
     private File rootFile;
-
-    private File logFile = null;
-
-    private FileOutputStream logFileOut = null;
 
     private Boolean skipContainerCreation = false;
 
@@ -82,8 +70,6 @@ public class ThreadedImportTask implements Runnable {
         if (session == null) {
             // TODO - open new session
         }
-        logFile = new File(
-                "import" + Thread.currentThread().getName() + ".log");
         if (session == null) {
             session = NuxeoClient.getInstance().openRepository();
         }
@@ -112,13 +98,13 @@ public class ThreadedImportTask implements Runnable {
     protected void commit(boolean force) throws Exception {
         uploadedFiles++;
         if (uploadedFiles % 10 == 0) {
-            //fslog(uploadedFiles + " doc created ...[" + Thread.currentThread().getName() + "]");
+            // log.info(uploadedFiles + " doc created ...[" +
+            // Thread.currentThread().getName() + "]");
             MTFSImportCommand.addCreatedDoc(taskId, uploadedFiles);
         }
 
         if (uploadedFiles % batchSize == 0 || force) {
-            fslog("Comiting Core Session after " + uploadedFiles
-                    + " files", true);
+            log.debug("Comiting Core Session after " + uploadedFiles + " files");
             session.save();
         }
     }
@@ -136,8 +122,7 @@ public class ThreadedImportTask implements Runnable {
         doc.putContextData("BLOCK_JMS_PRODUCING", true);
         doc.putContextData("BLOCK_SYNC_INDEXING", true);
 
-        fslog("Creating Folder " + name + " at "
-                + parent.getPathAsString(), true);
+        log.debug("Creating Folder " + name + " at " + parent.getPathAsString());
         doc = session.createDocument(doc);
         // save session if needed
         commit();
@@ -147,7 +132,7 @@ public class ThreadedImportTask implements Runnable {
     public DocumentModel createFile(DocumentModel parent, File file)
             throws Exception {
         if (!file.exists()) {
-            fslog("non readable file : " + file.getName());
+            log.error("non readable file : " + file.getName());
             return null;
         }
         String mimeType = getMimeType(file);
@@ -172,9 +157,8 @@ public class ThreadedImportTask implements Runnable {
         doc.setProperty("file", "content", streamingBlob);
         // doc = session.saveDocument(doc);
         long kbSize = file.length() / 1024;
-        fslog("Creating doc " + name + " at " + parent.getPathAsString()
-                + " with file " + fileName + " of size " + kbSize + "KB",
-                true);
+        log.debug("Creating doc " + name + " at " + parent.getPathAsString()
+                + " with file " + fileName + " of size " + kbSize + "KB");
         doc = session.createDocument(doc);
 
         uploadedKO += kbSize;
@@ -201,12 +185,14 @@ public class ThreadedImportTask implements Runnable {
             ThreadedImportTask newTask;
             try {
                 newTask = new ThreadedImportTask(file, parent);
-                //System.out.println("Created new Task with Session" + newTask.session.getSessionId());
+                // log.info("Created new Task with Session" +
+                // newTask.session.getSessionId());
             } catch (Exception e) {
-                System.out.println("************ERROR" + e.getMessage());
+                log.error(e);
                 return null;
             }
-            //System.out.println("Created new Thread on " + file.getAbsolutePath());
+            // log.info("Created new Thread on " +
+            // file.getAbsolutePath());
             newTask.setBatchSize(getBatchSize());
             newTask.setSkipContainerCreation(true);
             return newTask;
@@ -221,7 +207,7 @@ public class ThreadedImportTask implements Runnable {
                 folder = parent;
                 skipContainerCreation = false;
                 newThread = true;
-                //System.out.println("Skipping container creation");
+                // log.info("Skipping container creation");
             } else {
                 folder = createDirectory(parent, file);
             }
@@ -234,7 +220,7 @@ public class ThreadedImportTask implements Runnable {
                     task = getTask(folder, file);
                 }
                 if (task != null) {
-                    //force comit before starting new thread
+                    // force commit before starting new thread
                     session.save();
                     MTFSImportCommand.getExecutor().execute(task);
                 } else {
@@ -314,7 +300,7 @@ public class ThreadedImportTask implements Runnable {
             upload(rootDoc, rootFile);
             session.save();
             MTFSImportCommand.addCreatedDoc(taskId, uploadedFiles);
-            //fslog("doc upload terminated");
+            // log.info("doc upload terminated");
             CoreInstance.getInstance().close(session);
         } catch (Exception e) {
             log.error("Error during import", e);
@@ -338,34 +324,7 @@ public class ThreadedImportTask implements Runnable {
         try {
             CoreInstance.getInstance().close(session);
         } catch (Exception e) {
-            e.printStackTrace();// TODO
-        }
-    }
-
-    /** Logging hacks * */
-    private void fslog(String msg) {
-        fslog(msg, false);
-    }
-
-    // This should be done with log4j but I did not find a way to configure it
-    // the way I wanted ...
-    private void fslog(String msg, boolean debug) {
-        log.info(msg);
-
-        try {
-            if (logFileOut == null) {
-                logFile.createNewFile();
-                logFileOut = new FileOutputStream(logFile);
-            }
-            String strMessage = LOGDATEFORMAT.format(new Date()) + " -- " + msg
-                    + "\n";
-            logFileOut.write(strMessage.getBytes());
-        } catch (IOException e) {
-            log.error("Unable to log in file ", e);
-        }
-
-        if (!debug) {
-            System.out.println(msg);
+            log.error(e);
         }
     }
 

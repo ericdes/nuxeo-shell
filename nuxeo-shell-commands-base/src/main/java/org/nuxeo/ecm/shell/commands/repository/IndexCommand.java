@@ -22,6 +22,8 @@ package org.nuxeo.ecm.shell.commands.repository;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.search.api.client.IndexingException;
 import org.nuxeo.ecm.core.search.api.client.SearchService;
 import org.nuxeo.ecm.core.search.api.client.common.SearchServiceDelegate;
@@ -29,9 +31,10 @@ import org.nuxeo.ecm.shell.CommandLine;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public class IndexCommand extends AbstractCommand {
+    private static final Log log = LogFactory.getLog(IndexCommand.class);
 
     private static final String REPO_NAME = "default";
 
@@ -69,8 +72,10 @@ public class IndexCommand extends AbstractCommand {
             try {
                 batchSize = Integer.parseInt(elements[2]);
             } catch (Throwable t) {
-                System.err.println("Failed to parse batch size, using default");
                 batchSize = 20;
+                log.error(
+                        "Failed to parse batch size, using default batchSize="
+                                + batchSize, t);
             }
         }
 
@@ -78,7 +83,7 @@ public class IndexCommand extends AbstractCommand {
             try {
                 fullText = Boolean.parseBoolean(elements[3]);
             } catch (Throwable t) {
-                System.err.println("Failed to parse fullText option : skipping");
+                log.error("Failed to parse fullText option : skipping", t);
                 fullText = true;
             }
         }
@@ -102,9 +107,9 @@ public class IndexCommand extends AbstractCommand {
             searchService.setIndexingDocBatchSize(batchSize);
             // Reindex from the root and do not compute fulltext
             searchService.reindexAll(repoName, path, fullText);
-            System.out.println(timeFormater.format(new Date()) + " Indexing: "
-                        + path + " indexingDocBatchSize: " + orgBatchSize
-                        + " fullText: " + fullText);
+            log.info(timeFormater.format(new Date()) + " Indexing: " + path
+                    + " indexingDocBatchSize: " + orgBatchSize + " fullText: "
+                    + fullText);
             double s = System.currentTimeMillis();
             long lastNbIndexedDocs = 0;
             long lastDiff = 0;
@@ -116,7 +121,8 @@ public class IndexCommand extends AbstractCommand {
                         - initialIndexingThreadNumber;
                 long diff = nbIndexedDocs - lastNbIndexedDocs;
                 lastNbIndexedDocs = nbIndexedDocs;
-                if ((diff == 0) && (lastDiff == 0) && (searchService.getActiveIndexingTasks() <= 0)) {
+                if ((diff == 0) && (lastDiff == 0)
+                        && (searchService.getActiveIndexingTasks() <= 0)) {
                     break;
                 }
                 lastDiff = diff;
@@ -124,24 +130,22 @@ public class IndexCommand extends AbstractCommand {
                 double flow = nbIndexedDocs / tm;
                 double dflow = diff / (tm - lastTm);
                 lastTm = tm;
-                System.out.printf(
+                log.info(String.format(
                         "%s indexed %5d docs at %6.2f docs/s (%7d docs at %6.2f docs/s) %d threads %d queued (batch %d). \n",
                         timeFormater.format(new Date()), diff, dflow,
                         nbIndexedDocs, flow,
                         searchService.getActiveIndexingTasks(),
                         searchService.getIndexingWaitingQueueSize(),
-                        searchService.getIndexingDocBatchSize());
-
+                        searchService.getIndexingDocBatchSize()));
             }
             searchService.setIndexingDocBatchSize(orgBatchSize);
             double tm = (System.currentTimeMillis() - s) / 1000;
 
-            System.out.println("Indexing " + lastNbIndexedDocs + " done in "
-                    + tm + " seconds");
+            log.info("Indexing " + lastNbIndexedDocs + " done in " + tm
+                    + " seconds");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e);
         }
     }
-
 }

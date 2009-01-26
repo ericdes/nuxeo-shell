@@ -21,6 +21,8 @@ package org.nuxeo.ecm.shell.commands.io;
 
 import java.io.File;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.PathRef;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
@@ -36,18 +38,21 @@ import org.nuxeo.ecm.shell.CommandLine;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public class ExportCommand implements Command {
 
+    private static final Log log = LogFactory.getLog(ExportCommand.class);
+
     private final NuxeoClient client = NuxeoClient.getInstance();
+
     private RepositoryInstance repository;
 
     public void run(CommandLine cmdLine) throws Exception {
         String[] elements = cmdLine.getParameters();
         // parse cmd line
         if (elements.length != 2) {
-            System.err.println("Usage : export src dest");
+            log.error("Usage : export src dest");
             return;
         }
         String path = elements[0];
@@ -65,7 +70,7 @@ public class ExportCommand implements Command {
 
     void exportTree(String fromPath, File file) throws Exception {
         if (fromPath == null || file == null) {
-            System.err.println("Command Syntax Error. See help page");
+            log.error("Command Syntax Error. See help page");
             return;
         }
 
@@ -74,7 +79,7 @@ public class ExportCommand implements Command {
         try {
             DocumentModel root = repository.getDocument(new PathRef(fromPath));
             reader = new DocumentTreeReader(repository, root, false);
-            //((DocumentModelReader)reader).setInlineBlobs(true);
+            // ((DocumentModelReader)reader).setInlineBlobs(true);
             writer = new XMLDirectoryWriter(file);
 
             DocumentPipe pipe = new DocumentPipeImpl(10);

@@ -43,41 +43,7 @@ public class MTFSImportCommand extends AbstractCommand {
 
     static Map<String, Long> nbCreatedDocsByThreads = new ConcurrentHashMap<String, Long>();
 
-    private static final File logFile = new File("mtimport.log");
-
     private static final Log log = LogFactory.getLog(MTFSImportCommand.class);
-
-    private static final SimpleDateFormat LOGDATEFORMAT = new SimpleDateFormat(
-            "yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.US);
-
-    private static FileOutputStream logFileOut;
-
-    private static void fslog(String msg) {
-        fslog(msg, false);
-    }
-
-    // This should be done with log4j but I did not find a way to configure it
-    // the way I wanted ...
-    private static void fslog(String msg, boolean debug) {
-        log.info(msg);
-
-        try {
-            if (logFileOut == null) {
-
-                logFile.createNewFile();
-                logFileOut = new FileOutputStream(logFile);
-            }
-            String strMessage = LOGDATEFORMAT.format(new Date()) + " -- " + msg
-                    + "\n";
-            logFileOut.write(strMessage.getBytes());
-        } catch (IOException e) {
-            log.error("Unaable to log in file ", e);
-        }
-
-        if (!debug) {
-            System.out.println(msg);
-        }
-    }
 
     public static ThreadPoolExecutor getExecutor() {
         return importTP;
@@ -111,7 +77,7 @@ public class MTFSImportCommand extends AbstractCommand {
         String[] elements = cmdLine.getParameters();
         DocumentModel parent;
         if (elements.length == 0) {
-            System.out.println(
+            log.error(
                     "SYNTAX ERROR: the fsimport command must take at least one argument: fsimport local_file_path [remote_path] [batch_size] [nbThreads] ");
             printHelp();
             return;
@@ -128,7 +94,7 @@ public class MTFSImportCommand extends AbstractCommand {
             try {
                 parent = context.fetchDocument(path);
             } catch (Exception e) {
-                System.err.println("Failed to retrieve the given folder");
+                log.error("Failed to retrieve the given folder",e);
                 return;
             }
         } else {
@@ -140,8 +106,10 @@ public class MTFSImportCommand extends AbstractCommand {
             try {
                 batchSize = Integer.parseInt(elements[2]);
             } catch (Throwable t) {
-                System.err.println("Failed to parse batch size, using default");
                 batchSize = 10;
+                log.error(
+                        "Failed to parse batch size, using default batchSize="
+                                + batchSize, t);
             }
         }
 
@@ -150,7 +118,7 @@ public class MTFSImportCommand extends AbstractCommand {
             try {
                 nbThreads = Integer.parseInt(elements[3]);
             } catch (Throwable t) {
-                System.err.println("Failed to parse nbThreads, using default");
+                log.error("Failed to parse nbThreads, using default",t);
             }
         }
         importTP = new ThreadPoolExecutor(nbThreads, nbThreads, 500L,
@@ -172,18 +140,18 @@ public class MTFSImportCommand extends AbstractCommand {
                 System.out.println(
                         "currently " + activeTasks + " active import Threads");
                 long inbCreatedDocs = getCreatedDocsCounter();
-                fslog(inbCreatedDocs + " docs created");
+                log.info(inbCreatedDocs + " docs created");
                 long ti = System.currentTimeMillis();
-                fslog(1000 * ((float) (inbCreatedDocs) / (ti - t0)) + " docs/s");
+                log.info(1000 * ((float) (inbCreatedDocs) / (ti - t0)) + " docs/s");
             }
         }
-        fslog("All Threads terminated");
+        log.info("All Threads terminated");
         long t1 = System.currentTimeMillis();
         long nbCreatedDocs = getCreatedDocsCounter();
-        fslog(nbCreatedDocs + " docs created");
-        fslog(1000 * ((float) (nbCreatedDocs) / (t1 - t0)) + " docs/s");
+        log.info(nbCreatedDocs + " docs created");
+        log.info(1000 * ((float) (nbCreatedDocs) / (t1 - t0)) + " docs/s");
         for (String k : nbCreatedDocsByThreads.keySet()) {
-            fslog(k + " --> " + nbCreatedDocsByThreads.get(k), true);
+            log.debug(k + " --> " + nbCreatedDocsByThreads.get(k));
         }
     }
 

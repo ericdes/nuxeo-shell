@@ -23,6 +23,8 @@ import java.io.PrintStream;
 
 import jline.ConsoleReader;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.ecm.shell.Command;
 import org.nuxeo.ecm.shell.CommandDescriptor;
@@ -35,6 +37,8 @@ import org.nuxeo.runtime.api.Framework;
  *
  */
 public class InteractiveCommand implements Command {
+
+    private static final Log log = LogFactory.getLog(InteractiveCommand.class);
 
     private CommandLineService service;
     private ConsoleReader console;
@@ -88,8 +92,7 @@ public class InteractiveCommand implements Command {
             }
             runCommand(cmdLine);
         } catch (Throwable e) {
-            System.err.println("Command failed with error:");
-            e.printStackTrace();
+            log.error("Command failed.",e);
         }
         return false;
     }
@@ -97,7 +100,7 @@ public class InteractiveCommand implements Command {
     void runCommand(CommandLine cmdLine) throws Exception {
         CommandDescriptor cd = service.getCommand(cmdLine.getCommand());
         if (cd == null) {
-            System.err.println("Unknown command: "+cmdLine.getCommand());
+            log.error("Unknown command: "+cmdLine.getCommand());
         } else {
             service.runCommand(cd, cmdLine);
         }
@@ -112,15 +115,15 @@ public class InteractiveCommand implements Command {
     }
 
     /**
-     * For now only command autocompletion is available.
+     * For now only command auto-completion is available.
      *
      * @param sb
      */
     void autoComplete(StringBuilder sb) {
-        // TODO: add autocompletion for File System files and repository documents
+        // TODO: add auto-completion for File System files and repository documents
         String prefix = sb.toString();
         if (prefix.contains(" ")) {
-            return; // only command autocompletion is supported for now
+            return; // only command auto-completion is supported for now
         }
         CommandDescriptor[] cmds = service.getMatchingCommands(prefix);
         if (cmds.length == 0) {
@@ -131,7 +134,7 @@ public class InteractiveCommand implements Command {
             updatePrompt();
             System.out.print(cmds[0]);
         } else {
-            // show the possbile completions
+            // show the possible completions
             for (CommandDescriptor cd : cmds) {
                 System.out.println(cd.getName());
             }

@@ -19,19 +19,22 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.shell.CommandLine;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public class PwdCommand extends AbstractCommand {
+    private static final Log log = LogFactory.getLog(PwdCommand.class);
 
     @Override
     public void run(CommandLine cmdLine) throws Exception {
         DocumentModel doc = context.fetchDocument();
-        System.out.println(doc.getPathAsString());
+        log.info(doc.getPathAsString());
     }
 
 }

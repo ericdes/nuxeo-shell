@@ -19,15 +19,18 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.common.utils.Path;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.shell.CommandLine;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public class RmCommand extends AbstractCommand {
+    private static final Log log = LogFactory.getLog(RmCommand.class);
 
     @Override
     public void run(CommandLine cmdLine) throws Exception {
@@ -38,7 +41,7 @@ public class RmCommand extends AbstractCommand {
             try {
                 doc = context.fetchDocument(path);
             } catch (Exception e) {
-                System.err.println("Failed to retrieve the given folder");
+                log.error("Failed to retrieve the given folder", e);
                 return;
             }
         } else {

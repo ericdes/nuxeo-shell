@@ -21,17 +21,21 @@ package org.nuxeo.ecm.shell;
 
 import java.text.ParseException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.client.NuxeoClient;
 import org.nuxeo.runtime.api.Framework;
 
 /**
  * Should be used with the nuxeo launcher
- *
+ * 
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public class Main {
+
+    private static final Log log = LogFactory.getLog(Main.class);
 
     private Main() {
     }
@@ -40,12 +44,12 @@ public class Main {
 
         CommandLine cmdLine;
         CommandLineService service = Framework.getRuntime().getService(
-                CommandLineService.class);// (CommandLineService.NAME);
+                CommandLineService.class);
         try {
             cmdLine = service.parse(args, true);
         } catch (ParseException e) {
-            e.printStackTrace();
-            System.exit(1);
+            log.error(e);
+//            System.exit(1);
             return;
         }
 
@@ -74,7 +78,7 @@ public class Main {
         CommandDescriptor cd = service.getCommand(cmdName);
 
         if (cd == null) {
-            System.out.println("No such command was registered:  " + cmdName);
+            log.error("No such command was registered:  " + cmdName);
             System.exit(1);
         }
 
@@ -90,7 +94,7 @@ public class Main {
         try {
             service.runCommand(cd, cmdLine);
         } catch (Throwable e) {
-            e.printStackTrace();
+            log.error(e);
             System.exit(2);
         } finally {
             try {
@@ -101,12 +105,11 @@ public class Main {
                     }
                 }
                 NuxeoClient.getInstance().tryDisconnect();
+                log.info("Bye.");
                 Framework.shutdown();
-                System.out.println("Bye.");
                 System.exit(0);
             } catch (Exception e) {
-                System.err.println("Failed to Disconnect.");
-                e.printStackTrace();
+                log.error("Failed to Disconnect.",e);
             }
         }
     }

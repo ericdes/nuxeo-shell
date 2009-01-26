@@ -19,6 +19,8 @@
 
 package org.nuxeo.ecm.shell.commands.repository;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.DocumentRef;
@@ -31,15 +33,14 @@ import org.nuxeo.ecm.shell.commands.ColorHelper;
  *
  */
 public class TreeCommand extends AbstractCommand {
-
+    private static final Log log = LogFactory.getLog(TreeCommand.class);
     private int size = 0;
 
     @Override
     public void run(CommandLine cmdLine) throws Exception {
         long t0 = System.currentTimeMillis();
-        System.out.println("\n");
         getTreeList(null);
-        System.out.println("\n" + getSize() + " docs listed in "
+        log.info("\n" + getSize() + " docs listed in "
                 + (System.currentTimeMillis() - t0) + "ms\n");
 
     }
@@ -58,29 +59,29 @@ public class TreeCommand extends AbstractCommand {
             String docType = doc.getType();
             // Default domain
             if (isFolder && docType.equals("Domain")) {
-                System.out.println(ColorHelper.decorateName(doc, "+ "
+                log.info(ColorHelper.decorateName(doc, "+ "
                         + doc.getName()));
-                System.out.println(ColorHelper.decorateName(doc, "|"));
+                log.info(ColorHelper.decorateName(doc, "|"));
                 getTreeList(doc.getRef());
                 // Default Root Type
             } else if (isFolder
                     && (docType.equals("TemplateRoot")
                             || docType.equals("SectionRoot") || docType.equals("WorkspaceRoot"))) {
-                System.out.println(ColorHelper.decorateName(doc, "| |-+ "
+                log.info(ColorHelper.decorateName(doc, "| |-+ "
                         + doc.getName()));
-                System.out.println(ColorHelper.decorateName(doc, "| | |"));
+                log.info(ColorHelper.decorateName(doc, "| | |"));
                 getTreeList(doc.getRef());
                 // Default SubType
             } else if (isFolder
                     && (docType.equals("Workspace")
                             || docType.equals("Section") || docType.equals("Template"))) {
-                System.out.println(ColorHelper.decorateName(doc, "| | |-+ "
+                log.info(ColorHelper.decorateName(doc, "| | |-+ "
                         + doc.getName()));
-                System.out.println(ColorHelper.decorateName(doc, "| | | |"));
+                log.info(ColorHelper.decorateName(doc, "| | | |"));
                 getTreeList(doc.getRef());
                 // Documents
             } else {
-                System.out.println(ColorHelper.decorateBranchesInBlue("| | | |")
+                log.info(ColorHelper.decorateBranchesInBlue("| | | |")
                         + ColorHelper.decorateName(doc, "- " + doc.getName()));
             }
         }

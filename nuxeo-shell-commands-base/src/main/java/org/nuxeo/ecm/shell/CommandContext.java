@@ -22,6 +22,8 @@ package org.nuxeo.ecm.shell;
 import java.util.Collection;
 import java.util.HashMap;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.jboss.remoting.CannotConnectException;
 import org.nuxeo.common.utils.Path;
 import org.nuxeo.ecm.core.api.DocumentModel;
@@ -37,17 +39,26 @@ import org.nuxeo.runtime.api.Framework;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public class CommandContext extends HashMap<String, Object> {
+    private static final Log log = LogFactory.getLog(CommandContext.class);
 
     private static final long serialVersionUID = 921391738618179230L;
 
     private boolean interactive = false;
+
     private DocumentRef docRef;
+
     private CommandLine cmdLine;
+
     private RepositoryInstance repository;
+<<<<<<< local
     private final CommandLineService service;
+=======
+
+    private CommandLineService service;
+>>>>>>> other
 
     private Collection<String> candidateHosts;
 
@@ -160,7 +171,7 @@ public class CommandContext extends HashMap<String, Object> {
 
     /**
      * Whether the shell is running in the context of a local repository
-     *
+     * 
      * @return
      */
     public boolean isLocal() {
@@ -169,6 +180,7 @@ public class CommandContext extends HashMap<String, Object> {
 
     /**
      * Shortcut for {@link #getRepositoryInstance()}
+     * 
      * @return
      * @throws Exception
      */
@@ -192,7 +204,8 @@ public class CommandContext extends HashMap<String, Object> {
                 if (repoName == null) {
                     repository = NuxeoClient.getInstance().openRepository();
                 } else {
-                    repository = NuxeoClient.getInstance().openRepository(repoName);
+                    repository = NuxeoClient.getInstance().openRepository(
+                            repoName);
                 }
             }
         }
@@ -212,9 +225,9 @@ public class CommandContext extends HashMap<String, Object> {
                         password));
             }
             try {
-                System.out.println("Trying to connect to nuxeo server at " + h +
-                        ':' + port + " as " +
-                        (username == null ? "system user" : username) + "...");
+                log.info("Trying to connect to nuxeo server at " + h
+                        + ':' + port + " as "
+                        + (username == null ? "system user" : username) + "...");
                 client.connect(h, port);
                 setHost(h);
                 break;
@@ -226,7 +239,7 @@ public class CommandContext extends HashMap<String, Object> {
         if (getHost() == null) {
             throw new RuntimeException("Could not connect to server", exc);
         }
-        System.out.println("Connection established");
+        log.info("Connection established");
     }
 
     public RepositoryInstance openLocalRepository(String repoName) {
@@ -238,13 +251,14 @@ public class CommandContext extends HashMap<String, Object> {
             repository = repositoryManager.getRepository(repoName);
         }
         if (repository == null) {
-            throw new IllegalArgumentException("No local repository" +
-                    (repoName == null ? "" : " named '" + repoName + "'"));
+            throw new IllegalArgumentException("No local repository"
+                    + (repoName == null ? "" : " named '" + repoName + "'"));
         }
         return new LocalRepositoryInstanceHandler(repository, getUsername()).getProxy();
     }
 
-    public DocumentModel getDocumentByPath(DocumentRef base, Path path) throws Exception {
+    public DocumentModel getDocumentByPath(DocumentRef base, Path path)
+            throws Exception {
         RepositoryInstance repo = getRepositoryInstance();
         if (!path.isAbsolute()) {
             DocumentModel doc = repo.getDocument(base);
