@@ -23,9 +23,7 @@
         Print the list of available commands
       </description>
       <help>
-        Accepts a parameter to be used as a prefix to filter the
-        list of
-        commands
+        Accepts a parameter to be used as a prefix to filter the list of commands
       </help>
     </command>
 
@@ -54,8 +52,7 @@
       alt="s">
       <options>
         <option name="file" shortcut="f" var="true" type="file">
-          A path to the
-          script file to execute
+          A path to the script file to execute
         </option>
       </options>
       <description>Executes scripts</description>
@@ -76,8 +73,7 @@
     <command name="tree" class="org.nuxeo.ecm.shell.commands.repository.TreeCommand"
       alt="tree">
       <description>
-        List directory content and subdirectory content (on remote),
-        represented by a tree
+        List directory content and subdirectory content (on remote), represented by a tree
       </description>
       <params>
         <param index="0" type="doc" />
@@ -110,9 +106,7 @@
 
     <command name="mkdir" class="org.nuxeo.ecm.shell.commands.repository.MkDirCommand">
       <description>
-        Create a document of the specified type (or Folder) at
-        the
-        given path (or in the current path).
+        Create a document of the specified type (or Folder) at the given path (or in the current path).
       </description>
       <params>
         <param index="0" type="path" />
@@ -212,8 +206,7 @@
       </params>
       <options>
         <option name="update" var="false">
-          Whether to update by ID existing
-          documents. If this
+          Whether to update by ID existing documents. If this
           flag is not used the document path will be used as
           the document identifier and missing documents will
           be created.
@@ -221,42 +214,24 @@
       </options>
       <description>Import data into the repository</description>
       <help>
-        Imports data into the repository. The imported data
-        should be a
-        directory tree. Zip archives are not yet
-        supported by this client.
+        Imports data into the repository. The imported data should be a
+        directory tree. Zip archives are not yet supported by this client.
 
-        The
-        first parameter represents the filesystem path to
-        the archive to import.
+        The first parameter represents the filesystem path to the archive to import.
 
-        The second parameter is the Nuxeo path to a document
-        that will be used as
-        the root of the target subtree.
-        When using the update mode (--update
-        option) the root
-        doesn't matter (you can use / as the root).
+        The second parameter is the Nuxeo path to a document that will be used as the root of the target subtree.
+        When using the update mode (--update option) the root doesn't matter (you can use / as the root).
 
-        In default
-        mode (non-update), documents are matched by
-        path. If a document already
-        exists at the path specified
-        in the import file, it will be updated with
-        the new
-        data. Otherwise a new document is created.
+        In default mode (non-update), documents are matched by path. If a document already
+        exists at the path specified in the import file, it will be updated with
+        the new data. Otherwise a new document is created.
 
-        In update mode,
-        documents are matched by ID, and their
-        path doesn't matter. Documents are
-        only updated, never
-        created (an ID not present in the repository will be
-        ignored at import time).
+        In update mode, documents are matched by ID, and their path doesn't matter. Documents are
+        only updated, never created (an ID not present in the repository will be ignored at import time).
 
-        The update mode is recommended if you want to
-        update a
+        The update mode is recommended if you want to update a
         repository and not create new data, as it is faster and
-        doesn't
-        have a problem with documents that have moved.
+        doesn't have a problem with documents that have moved.
       </help>
     </command>
 
@@ -274,17 +249,11 @@
       <help>
         Export data from a repository
 
-        The first parameter is the Nuxeo path
-        of root of the
-        tree to export.
+        The first parameter is the Nuxeo path of root of the tree to export.
 
-        The second parameter is the filesystem
-        directory where
-        the export archive will be written.
+        The second parameter is the filesystem directory where the export archive will be written.
 
-        This client does not
-        yet support zip archives as an
-        export format. This will be added later.
+        This client does not yet support zip archives as an export format. This will be added later.
       </help>
     </command>
 
@@ -317,26 +286,20 @@
   <extension target="org.nuxeo.ecm.shell.CommandLineService" point="options">
 
     <option name="username" shortcut="u" var="true" value="system">
-      The username to
-      use when connecting. If not specified the
-      'system' user will be used.
+      The username to use when connecting. If not specified the 'system' user will be used.
     </option>
 
     <option name="password" shortcut="P" var="true">
-      The password to use when
-      connecting.
+      The password to use when connecting.
     </option>
 
     <option name="host" shortcut="h" var="true">
-      The host where to connect to. By
-      default no host is used - this
-      will force a local connection (in VM
-      repository)
+      The host where to connect to. 
+      By default no host is used - this will force a local connection (in VM repository)
     </option>
 
     <option name="port" shortcut="p" var="true" value="62474">
-      The port where to
-      connect to. By default '62474' is used.
+      The port where to connect to. By default '62474' is used.
     </option>
 
   </extension>
