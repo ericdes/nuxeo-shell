@@ -35,7 +35,7 @@
 
   <!-- Main logger -->
   <logger name="org.nuxeo">
-    <level value="DEBUG" />
+    <level value="INFO" />
     <appender-ref ref="FILE" />
   </logger>
   <!-- Console output -->
