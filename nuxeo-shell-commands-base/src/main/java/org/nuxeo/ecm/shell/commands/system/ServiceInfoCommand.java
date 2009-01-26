@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.schema.DocumentType;
 import org.nuxeo.ecm.core.schema.SchemaManager;
 import org.nuxeo.ecm.core.schema.TypeService;
@@ -38,17 +40,18 @@ import org.nuxeo.runtime.model.ExtensionPoint;
 import org.nuxeo.runtime.model.RegistrationInfo;
 
 /**
- * Command to show details information about resgistered components.
+ * Command to show details information about registered components.
  *
  * @author <a href="mailto:sf@nuxeo.com">Stefane Fermigier</a>
  */
 public class ServiceInfoCommand extends AbstractCommand {
+    private static final Log log = LogFactory.getLog(ServiceInfoCommand.class);
 
     @Override
     public void run(CommandLine cmdLine) throws Exception {
         String[] elements = cmdLine.getParameters();
         if (elements.length > 1) {
-            System.err.println(cmdLine.getCommand()
+            log.error(cmdLine.getCommand()
                     + " takes zero or one parameter: the component name");
         }
 
@@ -58,13 +61,13 @@ public class ServiceInfoCommand extends AbstractCommand {
         if (elements.length == 0) {
             List<RegistrationInfo> ris = util.listRegistrationInfos();
             for (RegistrationInfo ri : ris) {
-                System.out.print(show(ri, 0));
-                System.out.println("-------------------------------------");
+                log.info(show(ri, 0));
+                log.info("-------------------------------------");
             }
         } else {
             String name = elements[0];
             RegistrationInfo ri = cm.getRegistrationInfo(new ComponentName(name));
-            System.out.println(show(ri, 1));
+            log.info(show(ri, 1));
         }
     }
 

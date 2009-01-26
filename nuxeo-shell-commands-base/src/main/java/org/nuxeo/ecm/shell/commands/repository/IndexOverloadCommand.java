@@ -104,9 +104,9 @@ public class IndexOverloadCommand extends AbstractCommand {
             nb = 100;
             log.info("Nb of indexing tasks reduced to max queue size (100)");
         }
-        log.info("Sending tasks to search service threda pool");
+        log.info("Sending tasks to search service thread pool");
         for (int i = 0; i < nb; i++) {
-            System.out.println("!!! explicit indexing is disabled !!!");
+            log.info("!!! explicit indexing is disabled !!!");
         }
 
         while (searchService.getActiveIndexingTasks() > 0) {

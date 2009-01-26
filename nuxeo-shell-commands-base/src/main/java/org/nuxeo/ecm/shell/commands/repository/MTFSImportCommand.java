@@ -67,8 +67,7 @@ public class MTFSImportCommand extends AbstractCommand {
 
     private void printHelp() {
         System.out.println("");
-        System.out.println(
-                "Syntax: fsimport local_file_path [remote_path] [batch_size] [nbThreads]");
+        System.out.println("Syntax: fsimport local_file_path [remote_path] [batch_size] [nbThreads]");
     }
 
     @Override
@@ -77,8 +76,7 @@ public class MTFSImportCommand extends AbstractCommand {
         String[] elements = cmdLine.getParameters();
         DocumentModel parent;
         if (elements.length == 0) {
-            log.error(
-                    "SYNTAX ERROR: the fsimport command must take at least one argument: fsimport local_file_path [remote_path] [batch_size] [nbThreads] ");
+            log.error("SYNTAX ERROR: the fsimport command must take at least one argument: fsimport local_file_path [remote_path] [batch_size] [nbThreads] ");
             printHelp();
             return;
         }
@@ -94,7 +92,7 @@ public class MTFSImportCommand extends AbstractCommand {
             try {
                 parent = context.fetchDocument(path);
             } catch (Exception e) {
-                log.error("Failed to retrieve the given folder",e);
+                log.error("Failed to retrieve the given folder", e);
                 return;
             }
         } else {
@@ -118,7 +116,7 @@ public class MTFSImportCommand extends AbstractCommand {
             try {
                 nbThreads = Integer.parseInt(elements[3]);
             } catch (Throwable t) {
-                log.error("Failed to parse nbThreads, using default",t);
+                log.error("Failed to parse nbThreads, using default", t);
             }
         }
         importTP = new ThreadPoolExecutor(nbThreads, nbThreads, 500L,
@@ -137,12 +135,12 @@ public class MTFSImportCommand extends AbstractCommand {
             activeTasks = importTP.getActiveCount();
             if (oldActiveTasks != activeTasks) {
                 oldActiveTasks = activeTasks;
-                System.out.println(
-                        "currently " + activeTasks + " active import Threads");
+                log.info("currently " + activeTasks + " active import Threads");
                 long inbCreatedDocs = getCreatedDocsCounter();
                 log.info(inbCreatedDocs + " docs created");
                 long ti = System.currentTimeMillis();
-                log.info(1000 * ((float) (inbCreatedDocs) / (ti - t0)) + " docs/s");
+                log.info(1000 * ((float) (inbCreatedDocs) / (ti - t0))
+                        + " docs/s");
             }
         }
         log.info("All Threads terminated");
