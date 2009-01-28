@@ -214,7 +214,13 @@ public class CommandLineService extends DefaultComponent implements
         if (args == null || args.length == 0) {
             return cmdLine;
         }
-        cmdLine.addCommand(args[0]);
+        
+        if (args[1].startsWith("-")) {// if no command specified then we use by default interactive mode
+            cmdLine.addCommand("interactive");
+        } else {
+            cmdLine.addCommand(args[0]);  
+        }        
+        
         // if this is a dynamic script command we disable "validate" because
         // scripts may not declare the metadata() function that describe the
         // command
