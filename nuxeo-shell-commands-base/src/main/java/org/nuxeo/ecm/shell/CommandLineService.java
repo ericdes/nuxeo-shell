@@ -211,21 +211,10 @@ public class CommandLineService extends DefaultComponent implements
             throws ParseException {
         Queue<CommandOption> queue = new LinkedList<CommandOption>();
         CommandLine cmdLine = new CommandLine(this);
-        if (args.length == 0) {
+        if (args == null || args.length == 0) {
             return cmdLine;
         }
-        // skip any option before command name - these may be used by the
-        // launcher
-        int k = 0;
-        for (String arg : args) {
-            if (!arg.startsWith("-")) {
-                break;
-            } else {
-                k++;
-            }
-        }
-        // now parse the remaining arguments
-        cmdLine.addCommand(args[k]);
+        cmdLine.addCommand(args[0]);
         // if this is a dynamic script command we disable "validate" because
         // scripts may not declare the metadata() function that describe the
         // command
@@ -235,7 +224,7 @@ public class CommandLineService extends DefaultComponent implements
                 validate = false;
             }
         }
-        for (int i = k + 1; i < args.length; i++) {
+        for (int i = 1; i < args.length; i++) {
             String arg = args[i];
             CommandOption opt;
             if (arg.startsWith("-")) {
@@ -340,13 +329,19 @@ public class CommandLineService extends DefaultComponent implements
             if (k == -1) {
                 return; // do not activate the console
             }
-            final String[] newArgs = new String[args.length - k];
-            if (newArgs.length > 0) {
+            String[] newArgs = null;;
+            // if an option follows and not a command it meanswe are executed in dev mode (with optional params)
+            // so we must start the interactive mode (empty command)
+            if (k < args.length && !args[k].startsWith("-")) {
+                newArgs = new String[args.length - k];
                 System.arraycopy(args, k, newArgs, 0, newArgs.length);
+            } else {
+                newArgs = new String[0];
             }
+            final String[] _args = newArgs;
             StandaloneApplication.setMainTask(new Runnable() {
                 public void run() {
-                    Main.main(newArgs);
+                    Main.main(_args);
                 }
             });
         }
