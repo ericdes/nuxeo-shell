@@ -329,19 +329,13 @@ public class CommandLineService extends DefaultComponent implements
             if (k == -1) {
                 return; // do not activate the console
             }
-            String[] newArgs = null;;
-            // if an option follows and not a command it meanswe are executed in dev mode (with optional params)
-            // so we must start the interactive mode (empty command)
-            if (k < args.length && !args[k].startsWith("-")) {
-                newArgs = new String[args.length - k];
+            final String[] newArgs = new String[args.length - k];
+            if (newArgs.length > 0) {
                 System.arraycopy(args, k, newArgs, 0, newArgs.length);
-            } else {
-                newArgs = new String[0];
             }
-            final String[] _args = newArgs;
             StandaloneApplication.setMainTask(new Runnable() {
                 public void run() {
-                    Main.main(_args);
+                    Main.main(newArgs);
                 }
             });
         }
