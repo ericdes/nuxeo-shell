@@ -214,10 +214,11 @@ public class CommandLineService extends DefaultComponent implements
         if (args == null || args.length == 0) {
             return cmdLine;
         }
-        
-        if (args[1].startsWith("-")) {// if no command specified then we use by default interactive mode
+        int k = 0;
+        if (args[0].startsWith("-")) {// if no command specified then we use by default interactive mode
             cmdLine.addCommand("interactive");
         } else {
+            k =1;
             cmdLine.addCommand(args[0]);  
         }        
         
@@ -230,7 +231,7 @@ public class CommandLineService extends DefaultComponent implements
                 validate = false;
             }
         }
-        for (int i = 1; i < args.length; i++) {
+        for (int i = k; i < args.length; i++) {
             String arg = args[i];
             CommandOption opt;
             if (arg.startsWith("-")) {
