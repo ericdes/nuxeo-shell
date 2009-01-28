@@ -41,7 +41,7 @@ import org.nuxeo.runtime.services.streaming.StreamSource;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public class FSImportCommand extends AbstractCommand {
 
@@ -161,7 +161,7 @@ public class FSImportCommand extends AbstractCommand {
 
     /**
      * A worker is importing a sub-tree
-     * 
+     *
      * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
      */
     protected class ImportTask implements Runnable {

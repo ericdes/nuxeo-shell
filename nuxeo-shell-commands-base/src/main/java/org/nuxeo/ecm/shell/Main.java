@@ -29,9 +29,9 @@ import org.nuxeo.runtime.api.Framework;
 
 /**
  * Should be used with the nuxeo launcher
- * 
+ *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public class Main {
 

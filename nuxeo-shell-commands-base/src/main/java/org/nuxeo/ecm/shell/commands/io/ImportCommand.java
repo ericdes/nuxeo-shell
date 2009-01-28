@@ -37,7 +37,7 @@ import org.nuxeo.ecm.shell.CommandLine;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public class ImportCommand implements Command {
     private static final Log log = LogFactory.getLog(ImportCommand.class);
