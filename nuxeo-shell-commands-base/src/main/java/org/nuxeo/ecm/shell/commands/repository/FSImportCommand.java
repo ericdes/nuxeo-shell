@@ -341,8 +341,8 @@ public class FSImportCommand extends AbstractCommand {
         }
 
         /**
-	 * TODO: Modify this to get right mime types depending on the file
-	 * input.
+         * TODO: Modify this to get right mime types depending on the file
+         * input.
          */
         protected String getMimeType(File file) {
             // Dummy MimeType detection : plug nuxeo Real MimeType service to
