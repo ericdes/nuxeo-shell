@@ -166,19 +166,14 @@ public class CommandContext extends HashMap<String, Object> {
     }
 
     /**
-     * Whether the shell is running in the context of a local repository
-     * 
-     * @return
+     * Whether the shell is running in the context of a local repository.
      */
     public boolean isLocal() {
         return candidateHosts == null;
     }
 
     /**
-     * Shortcut for {@link #getRepositoryInstance()}
-     * 
-     * @return
-     * @throws Exception
+     * Shortcut for {@link #getRepositoryInstance()}.
      */
     public RepositoryInstance getCoreSession() throws Exception {
         return getRepositoryInstance();

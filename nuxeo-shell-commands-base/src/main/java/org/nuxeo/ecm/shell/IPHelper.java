@@ -31,6 +31,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Helper for IPv4 addresses.
+ */
 public class IPHelper {
 
     private static final String p255 = "(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)";
