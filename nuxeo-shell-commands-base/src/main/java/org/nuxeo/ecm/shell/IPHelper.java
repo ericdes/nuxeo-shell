@@ -46,7 +46,7 @@ public class IPHelper {
     public static Collection<String> findCandidateIPs(String host) {
         Matcher ipMatcher = IpV4Pattern.matcher(host);
         if (ipMatcher.matches()) {
-            // already an IPv4 addess
+            // already an IPv4 address
             return Collections.singleton(host);
         }
         try {

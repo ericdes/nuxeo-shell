@@ -50,7 +50,7 @@ public class CommandOption {
     String command;
 
     // the type will be used to lookup for a value completor.
-    // The file type will use a "file" autocmpletion while fthe "doc" type a doducment name autocompletion
+    // The file type will use a "file" for auto-completion while the "doc" type a document name
     @XNode("@type")
     String type;
 
