@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * Contributors:
- *     bstefanescu
+ *     bstefanescu, jcarsique
  *
  * $Id$
  */
@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.core.client.NuxeoClient;
+import org.nuxeo.ecm.shell.commands.system.LogCommand;
 import org.nuxeo.runtime.api.Framework;
 
 /**
@@ -74,6 +75,11 @@ public class Main {
         }
         cmdContext.setUsername(cmdLine.getOption(Options.USERNAME));
         cmdContext.setPassword(cmdLine.getOption(Options.PASSWORD));
+        
+        boolean debugMode = cmdLine.getOption(Options.DEBUG)!=null;
+        if (debugMode) {
+            LogCommand.setDebug(true);
+        }
 
         CommandDescriptor cd = service.getCommand(cmdName);
 

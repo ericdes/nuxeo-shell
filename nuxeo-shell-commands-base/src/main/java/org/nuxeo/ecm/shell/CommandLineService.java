@@ -164,9 +164,9 @@ public class CommandLineService extends DefaultComponent implements
     }
 
     public CommandDescriptor[] getSortedCommands() {
-        CommandDescriptor[] cmds = getCommands();
-        Arrays.sort(cmds);
-        return cmds;
+        CommandDescriptor[] commands = getCommands();
+        Arrays.sort(commands);
+        return commands;
     }
 
     public CommandDescriptor[] getMatchingCommands(String prefix) {
@@ -176,9 +176,9 @@ public class CommandLineService extends DefaultComponent implements
                 result.add(cmd);
             }
         }
-        CommandDescriptor[] cmds = result.toArray(new CommandDescriptor[result.size()]);
-        Arrays.sort(cmds);
-        return cmds;
+        CommandDescriptor[] commands = result.toArray(new CommandDescriptor[result.size()]);
+        Arrays.sort(commands);
+        return commands;
     }
 
     public CommandOption getCommandOption(String name) {
