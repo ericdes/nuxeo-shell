@@ -93,7 +93,7 @@ public class DefaultCommandDescriptor implements CommandDescriptor {
     }
 
     /**
-     * Set alternate names
+     * Set alternate names.
      */
     @XNode("@alt")
     void setAlt(String alt) {

@@ -30,7 +30,7 @@ import org.nuxeo.runtime.model.RegistrationInfo;
 
 /**
  * @author <a href="mailto:sf@nuxeo.com">Stefane Fermigier</a>
- * 
+ *
  */
 public class ServicesCommand extends AbstractCommand {
     private static final Log log = LogFactory.getLog(ServicesCommand.class);

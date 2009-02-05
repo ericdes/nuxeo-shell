@@ -28,14 +28,13 @@ package org.nuxeo.ecm.shell;
  * </ul>
  *
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
  */
 public class Token {
 
     public static final int COMMAND = 0;
-    public static final int OPTION = 1;
+    public static final int OPTION  = 1;
     public static final int VALUE   = 2;
-    public static final int PARAM  = 3;
+    public static final int PARAM   = 3;
 
     /**
      * The token type
@@ -48,9 +47,11 @@ public class Token {
     public final int index;
 
     /**
-     * for OPTIONs this is the token index for it's value (0 based)
-     * for VALUEs this is the token index for the target option (0 based)
-     * for PARAMs this is the index of the parameter in the parameter list (0 based)
+     * <ul>
+     * <li>for OPTIONs this is the token index for its value (0 based)
+     * <li>for VALUEs this is the token index for the target option (0 based)
+     * <li>for PARAMs this is the index of the parameter in the parameter list (0 based)
+     * </ul>
      */
     public int info;
 

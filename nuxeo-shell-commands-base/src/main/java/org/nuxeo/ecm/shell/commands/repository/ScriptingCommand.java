@@ -63,7 +63,7 @@ public class ScriptingCommand extends AbstractCommand {
     protected long lastModified = 0;
     protected CommandHeader header;
 
-    public ScriptingCommand(CommandDescriptor descriptor, File file) throws ScriptException {
+    public ScriptingCommand(CommandDescriptor descriptor, File file) {
         this.descriptor = descriptor;
         this.file = file;
         lastModified = file.lastModified();
