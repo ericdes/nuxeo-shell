@@ -20,7 +20,6 @@
 package org.nuxeo.ecm.shell.commands.repository;
 
 import java.text.SimpleDateFormat;
-import java.util.Formatter;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
