@@ -13,7 +13,6 @@
   <name>Nuxeo Shell Parent</name>
   <description>Nuxeo ECM: Shell Parent</description>
   <packaging>pom</packaging>
-
   <modules>
     <module>nuxeo-shell</module>
     <module>nuxeo-shell-commands-base</module>

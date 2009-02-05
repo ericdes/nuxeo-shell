@@ -5,42 +5,24 @@
   </fileSet>
 
   <artifactSet id="launcher-lib">
-    <import>*</import>
+    <import>**</import>
+    <includeDependencies>false</includeDependencies>
     <includes>
       <artifact name="nuxeo-runtime-launcher" />
     </includes>
   </artifactSet>
 
   <artifactSet id="bundles">
-    <import>*</import>
+    <import>**</import>
+    <includeDependencies>false</includeDependencies>
     <includes>
-      <artifact group="org.nuxeo.ecm.*" />      
-      <artifact group="org.nuxeo.runtime*" />
-      <artifact group="org.nuxeo.common" />
-      <artifact group="org.nuxeo.ecm.*" />
+      <artifact group="org.nuxeo.*" />
     </includes>
     <excludes>
       <artifact name="nuxeo-runtime-launcher"/>
+      <artifact name="nuxeo-runtime-test"/>
     </excludes>
   </artifactSet>
-
-  <!--artifactSet id="bundles">
-    <import>*</import>
-    <includes>
-      <artifact name="nuxeo-runtime" />
-      <artifact name="nuxeo-runtime-scripting" />
-      <artifact name="nuxeo-runtime-osgi" />
-      <artifact name="nuxeo-core-api" />
-      <artifact name="nuxeo-core-schema" />
-      <artifact name="nuxeo-core-client" />
-      <artifact name="nuxeo-core-io-api" />
-      <artifact name="nuxeo-core-io" />
-      <artifact name="nuxeo-platform-search-api" />
-      <artifact name="nuxeo-shell-commands-base" />
-      <artifact name="nuxeo-platform-audit-api" />
-    </includes>
-  </artifactSet-->
-
 
   <artifactSet id="third-party-libs">
     <import>*</import>
@@ -52,8 +34,27 @@
       <artifact name="commons-logging" />      
       <artifact group="log4j" name="log4j" />
     </includes>
+    <excludes>
+      <!--
+      Sadly and those excludes don't actually exclude 
+      lib/nuxeo-runtime-test-XXX.jar 
+      -->
+      <artifact group="org.nuxeo.runtime" />
+      <artifact name="nuxeo-runtime-test"/>
+    </excludes>
   </artifactSet>
 
+<!-- This is another tentative way to declare dependencies --> 
+<!--  <artifactSet id="nuxeo-libs-via-dependency-tree">-->
+<!--    <import>**</import>-->
+<!--    <includeDependencies>true</includeDependencies>-->
+<!--    <includes>-->
+<!--      <artifact scope="compile" />-->
+<!--    </includes>-->
+<!--    <excludes>-->
+<!--      <artifact group="org.nuxeo.*" />-->
+<!--    </excludes>-->
+<!--  </artifactSet>-->
 
   <assemble>
     <set>template</set>
@@ -66,6 +67,7 @@
   </assemble>
 
   <assemble>
+    <!-- <set>nuxeo-libs-via-dependency-tree</set> -->
     <set>third-party-libs</set>
     <outputFile>nxshell/lib</outputFile>
   </assemble>
