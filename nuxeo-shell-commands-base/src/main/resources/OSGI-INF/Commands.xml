@@ -268,8 +268,10 @@
 
     <command name="log" class="org.nuxeo.ecm.shell.commands.system.LogCommand">
       <description>
-        Write log informations to given file.
+        Manage logs informations written to given file.
         Usage: log filename [log level [package or class]]
+               log off [package or class]
+               log debug
       </description>
       <params>
         <param index="0" type="file" />
@@ -277,7 +279,7 @@
 <!--        <param index="1" type="class" />-->
       </params>
       <help>Dynamically define a logger and its parameters (output
-        file, log level, package or class filtered)</help>
+        file, log level, package or class filtered). Start or stop debug mode.</help>
     </command>
 
   </extension>
@@ -300,6 +302,10 @@
 
     <option name="port" shortcut="p" var="true" value="62474">
       The port where to connect to. By default '62474' is used.
+    </option>
+
+    <option name="debug" shortcut="d" var="false">
+      Run in debug mode with full logs to console. By default 'INFO' is used.
     </option>
 
   </extension>

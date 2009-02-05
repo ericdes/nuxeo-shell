@@ -12,7 +12,7 @@
  * Lesser General Public License for more details.
  *
  * Contributors:
- *     bstefanescu
+ *     bstefanescu, jcarsique
  *
  * $Id$
  */
@@ -32,6 +32,7 @@ public class Options {
     static final String INTERACTIVE = "interactive";
     static final String HELP = "help";
     static final String REPOSITORY = "repository";
+    static final String DEBUG = "debug";
 
     // Constant utility class.
     private Options() {
