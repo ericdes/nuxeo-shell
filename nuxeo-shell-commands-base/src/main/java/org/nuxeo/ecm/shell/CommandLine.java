@@ -45,16 +45,10 @@ public class CommandLine extends ArrayList<Token> {
         parameters = new ArrayList<String>();
     }
 
-    /**
-     * @return the command.
-     */
     public String getCommand() {
         return command;
     }
 
-    /**
-     * @param command the command to set.
-     */
     public Token addCommand(String command) {
         Token token = new Token(Token.COMMAND, command, size());
         add(token);
@@ -69,9 +63,6 @@ public class CommandLine extends ArrayList<Token> {
         return token;
     }
 
-    /**
-     * @return the isInteractive.
-     */
     public boolean isInteractive() {
         return options.containsKey(Options.INTERACTIVE);
     }
@@ -93,9 +84,6 @@ public class CommandLine extends ArrayList<Token> {
 
     /**
      * Adds a new token was parsed.
-     *
-     * @param name
-     * @param value
      */
     public Token addOptionValue(String name, String value) {
         Token token = new Token(Token.VALUE, value, size());
@@ -113,8 +101,6 @@ public class CommandLine extends ArrayList<Token> {
 
     /**
      * Adds a new Parameter token.
-     *
-     * @param str
      */
     public Token addParameter(String str) {
         Token token = new Token(Token.PARAM, str, size(), parameters.size());
