@@ -1,5 +1,5 @@
 /*
- * (C) Copyright 2006-2007 Nuxeo SAS (http://nuxeo.com/) and contributors.
+ * (C) Copyright 2006-2009 Nuxeo SA (http://nuxeo.com/) and contributors.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the GNU Lesser General Public License
@@ -19,9 +19,12 @@
 
 package org.nuxeo.ecm.shell.commands;
 
+import java.io.File;
 import java.io.PrintStream;
+import java.util.List;
 
 import jline.ConsoleReader;
+import jline.History;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,14 +37,21 @@ import org.nuxeo.runtime.api.Framework;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * @author M.-A. Darche
  */
 public class InteractiveCommand implements Command {
 
     private static final Log log = LogFactory.getLog(InteractiveCommand.class);
 
+    private static enum CommandLineReturn {
+        SUCCESS, FAILURE, QUIT,
+    }
+
     private CommandLineService service;
+
     private ConsoleReader console;
+
+    private History commandLineHistory;
 
     public ConsoleReader getConsole() {
         return console;
@@ -55,11 +65,23 @@ public class InteractiveCommand implements Command {
         service = Framework.getService(CommandLineService.class);
         console = new ConsoleReader();
         CompositeCompletor completor = new CompositeCompletor(this);
-//        ArgumentCompletor completor = new ArgumentCompletor(
-//                new Completor[] {new SimpleCompletor(service.getCommandNames()),
-//                cc});
-//        completor.setStrict(false);
+        // ArgumentCompletor completor = new ArgumentCompletor(
+        // new Completor[] {new SimpleCompletor(service.getCommandNames()),
+        // cc});
+        // completor.setStrict(false);
         console.addCompletor(completor);
+
+        String userHome = System.getProperty("user.home");
+        log.trace("userHome = " + userHome);
+        System.out.println();
+        File historyFile = new File(userHome, ".nuxeoshell_history");
+        log.trace("historyFile = " + historyFile);
+        History commandLineHistory = new History(historyFile);
+
+        // Here we give the management of history to the console,
+        // so the console does all the work of dealing with the history.
+        // TODO: find a way to not keep in history the unknown commands.
+        console.setHistory(commandLineHistory);
 
         while (true) {
             updatePrompt();
@@ -72,35 +94,39 @@ public class InteractiveCommand implements Command {
             if (line.length() == 0) {
                 continue;
             }
-            if (processInput(line)) {
+            CommandLineReturn commandLineReturn = processInput(line);
+            if (commandLineReturn == CommandLineReturn.QUIT) {
                 break;
             }
         }
     }
 
-    public void printHelp(PrintStream out) {
-        out.print("A mode where commands can be run interactively. TODO");
-    }
-
-    boolean processInput(String input) {
+    /**
+     * @return the {@link CommandLineReturn} corresponding to the execution
+     *         result of the command.
+     */
+    CommandLineReturn processInput(String input) {
         String[] args = input.split("[ ]+");
         try {
             CommandLine cmdLine = service.parse(args, true);
             String cmdName = cmdLine.getCommand();
-            if ("exit".equals(cmdName) || "quit".equals(cmdName) || "bye".equals(cmdName)) {
-                return true;
+            if ("exit".equals(cmdName) || "quit".equals(cmdName)
+                    || "bye".equals(cmdName)) {
+                return CommandLineReturn.QUIT;
             }
             runCommand(cmdLine);
         } catch (Throwable e) {
-            log.error("Command failed.",e);
+            log.error("Command failed.", e);
+            return CommandLineReturn.FAILURE;
         }
-        return false;
+        return CommandLineReturn.SUCCESS;
     }
 
     void runCommand(CommandLine cmdLine) throws Exception {
         CommandDescriptor cd = service.getCommand(cmdLine.getCommand());
         if (cd == null) {
-            log.error("Unknown command: "+cmdLine.getCommand());
+            log.error("Unknown command: " + cmdLine.getCommand());
+            //throw new Exception("Unknown command: " + cmdLine.getCommand());
         } else {
             service.runCommand(cd, cmdLine);
         }
@@ -108,7 +134,8 @@ public class InteractiveCommand implements Command {
 
     void updatePrompt() {
         if (NuxeoClient.getInstance().isConnected()) {
-            console.setDefaultPrompt(service.getCommandContext().getHost()+"> ");
+            console.setDefaultPrompt(service.getCommandContext().getHost()
+                    + "> ");
         } else {
             console.setDefaultPrompt("|> ");
         }
@@ -116,11 +143,12 @@ public class InteractiveCommand implements Command {
 
     /**
      * For now only command auto-completion is available.
-     *
+     * 
      * @param sb
      */
     void autoComplete(StringBuilder sb) {
-        // TODO: add auto-completion for File System files and repository documents
+        // TODO: add auto-completion for File System files and repository
+        // documents
         String prefix = sb.toString();
         if (prefix.contains(" ")) {
             return; // only command auto-completion is supported for now
@@ -145,6 +173,10 @@ public class InteractiveCommand implements Command {
 
     static void beep() {
         System.out.print(7);
+    }
+
+    public void printHelp(PrintStream out) {
+        out.print("A mode where commands can be run interactively. TODO");
     }
 
 }
