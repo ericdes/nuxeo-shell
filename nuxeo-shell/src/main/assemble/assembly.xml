@@ -27,8 +27,7 @@
   <artifactSet id="third-party-libs">
     <import>*</import>
     <includes>
-      <artifact group="jboss" />
-      <artifact group="concurrent" />
+      <artifact group="org.jboss.client" />
       <artifact group="jline" />
       <artifact group="dom4j" />
       <artifact group="org.osgi" />

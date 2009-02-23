@@ -1,0 +1,4 @@
+This module is deprecated in 5.2
+Use nuxeo-distribution/nuxeo-distribution-shell instead.
+
+For developers, remember to port changes from 5.1 on nuxeo-distribution-shell

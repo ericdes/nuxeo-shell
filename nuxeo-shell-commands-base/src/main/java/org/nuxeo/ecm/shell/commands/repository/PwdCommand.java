@@ -26,7 +26,7 @@ import org.nuxeo.ecm.shell.CommandLine;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public class PwdCommand extends AbstractCommand {
     private static final Log log = LogFactory.getLog(PwdCommand.class);
