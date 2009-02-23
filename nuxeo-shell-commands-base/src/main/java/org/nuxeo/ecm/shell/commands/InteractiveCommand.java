@@ -21,7 +21,6 @@ package org.nuxeo.ecm.shell.commands;
 
 import java.io.File;
 import java.io.PrintStream;
-import java.util.List;
 
 import jline.ConsoleReader;
 import jline.History;
@@ -51,8 +50,6 @@ public class InteractiveCommand implements Command {
 
     private ConsoleReader console;
 
-    private History commandLineHistory;
-
     public ConsoleReader getConsole() {
         return console;
     }
@@ -79,8 +76,10 @@ public class InteractiveCommand implements Command {
         History commandLineHistory = new History(historyFile);
 
         // Here we give the management of history to the console,
-        // so the console does all the work of dealing with the history.
-        // TODO: find a way to not keep in history the unknown commands.
+        // so the ConsoleReader does all the work of dealing with the history.
+        // Even the unknown commands will be kept back in the history. This is a
+        // good thing since it makes it possible to correct a line with errors
+        // without having to retype the whole line.
         console.setHistory(commandLineHistory);
 
         while (true) {
@@ -115,6 +114,8 @@ public class InteractiveCommand implements Command {
                 return CommandLineReturn.QUIT;
             }
             runCommand(cmdLine);
+        } catch (UnknownCommandException e) {
+            return CommandLineReturn.FAILURE;
         } catch (Throwable e) {
             log.error("Command failed.", e);
             return CommandLineReturn.FAILURE;
@@ -126,7 +127,7 @@ public class InteractiveCommand implements Command {
         CommandDescriptor cd = service.getCommand(cmdLine.getCommand());
         if (cd == null) {
             log.error("Unknown command: " + cmdLine.getCommand());
-            //throw new Exception("Unknown command: " + cmdLine.getCommand());
+            throw new UnknownCommandException();
         } else {
             service.runCommand(cd, cmdLine);
         }
@@ -177,6 +178,20 @@ public class InteractiveCommand implements Command {
 
     public void printHelp(PrintStream out) {
         out.print("A mode where commands can be run interactively. TODO");
+    }
+
+    private class UnknownCommandException extends Exception {
+        public UnknownCommandException() {
+        }
+
+        public UnknownCommandException(String message) {
+            super(message);
+        }
+
+        public UnknownCommandException(Throwable cause) {
+            super(cause);
+        }
+
     }
 
 }
