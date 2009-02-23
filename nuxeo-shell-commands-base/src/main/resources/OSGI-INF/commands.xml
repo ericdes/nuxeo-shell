@@ -60,7 +60,7 @@
     </command>
 
     <command name="ls" class="org.nuxeo.ecm.shell.commands.repository.ListCommand"
-      alt="list">
+      alt="list,l">
       <description>
         List directory content (on remote)
       </description>
