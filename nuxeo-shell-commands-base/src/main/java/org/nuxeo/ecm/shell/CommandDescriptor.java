@@ -34,37 +34,17 @@ public interface CommandDescriptor extends Comparable<CommandDescriptor> {
 
     boolean hasArguments();
 
-    /**
-     * @return the aliases.
-     */
     String[] getAliases();
 
-    /**
-     * @return the description.
-     */
     String getDescription();
 
-    /**
-     * @return the help.
-     */
     String getHelp();
 
-
-    /**
-     * @return the name.
-     */
     String getName();
 
-    /**
-     * @return the options.
-     */
     CommandOption[] getOptions();
 
-    /**
-     * @return the params.
-     */
     CommandParameter[] getArguments();
-
 
     Command newInstance() throws Exception;
 

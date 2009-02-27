@@ -34,7 +34,7 @@ import org.nuxeo.ecm.shell.commands.ColorHelper;
  */
 public class ListCommand extends AbstractCommand {
     private static final Log log = LogFactory.getLog(ListCommand.class);
-    
+
     @Override
     public void run(CommandLine cmdLine) throws Exception {
         RepositoryInstance repo = context.getRepositoryInstance();

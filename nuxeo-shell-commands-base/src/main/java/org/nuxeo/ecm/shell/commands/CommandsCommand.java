@@ -29,7 +29,7 @@ import org.nuxeo.runtime.api.Framework;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public class CommandsCommand implements Command {
     private static final Log log = LogFactory.getLog(CommandsCommand.class);

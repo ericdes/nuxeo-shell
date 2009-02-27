@@ -41,7 +41,7 @@ import org.nuxeo.runtime.services.streaming.StreamSource;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public class FSImportCommand extends AbstractCommand {
 
@@ -161,7 +161,7 @@ public class FSImportCommand extends AbstractCommand {
 
     /**
      * A worker is importing a sub-tree
-     * 
+     *
      * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
      */
     protected class ImportTask implements Runnable {
@@ -343,9 +343,6 @@ public class FSImportCommand extends AbstractCommand {
         /**
          * TODO: Modify this to get right mime types depending on the file
          * input.
-         * 
-         * @param file
-         * @return
          */
         protected String getMimeType(File file) {
             // Dummy MimeType detection : plug nuxeo Real MimeType service to
@@ -444,9 +441,8 @@ public class FSImportCommand extends AbstractCommand {
                 long t1 = System.currentTimeMillis();
                 // Thread.sleep(2000);
                 log.info(uploadedFiles + " doc created in " + (t1 - t0) + "ms");
-                log.info(uploadedFiles / ((double) ((t1 - t0) / 1000.0))
-                        + " doc/s");
-                log.info(uploadedKO / ((double) ((t1 - t0) / 1000.0)) + " KB/s");
+                log.info(uploadedFiles / ((t1 - t0) / 1000.0) + " doc/s");
+                log.info(uploadedKO / ((t1 - t0) / 1000.0) + " KB/s");
                 if (searchService != null) {
                     log.info("waiting for asynchronous indexing to finish");
                     while (searchService.getActiveIndexingTasks() > 0) {

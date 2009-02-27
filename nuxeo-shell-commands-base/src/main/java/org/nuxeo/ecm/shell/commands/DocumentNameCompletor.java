@@ -41,6 +41,7 @@ public class DocumentNameCompletor implements Completor {
         this.service = service;
     }
 
+    @SuppressWarnings({"unchecked"})
     public int complete(String buf, int off, List candidates) {
         if (buf == null) {
             buf = "";

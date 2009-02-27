@@ -39,7 +39,7 @@ import org.nuxeo.runtime.api.Framework;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public class CommandContext extends HashMap<String, Object> {
     private static final Log log = LogFactory.getLog(CommandContext.class);
@@ -54,7 +54,7 @@ public class CommandContext extends HashMap<String, Object> {
 
     private RepositoryInstance repository;
 
-    private CommandLineService service;
+    private final CommandLineService service;
 
     private Collection<String> candidateHosts;
 
@@ -166,19 +166,14 @@ public class CommandContext extends HashMap<String, Object> {
     }
 
     /**
-     * Whether the shell is running in the context of a local repository
-     * 
-     * @return
+     * Whether the shell is running in the context of a local repository.
      */
     public boolean isLocal() {
         return candidateHosts == null;
     }
 
     /**
-     * Shortcut for {@link #getRepositoryInstance()}
-     * 
-     * @return
-     * @throws Exception
+     * Shortcut for {@link #getRepositoryInstance()}.
      */
     public RepositoryInstance getCoreSession() throws Exception {
         return getRepositoryInstance();
@@ -221,8 +216,8 @@ public class CommandContext extends HashMap<String, Object> {
                         password));
             }
             try {
-                log.info("Trying to connect to nuxeo server at " + h
-                        + ':' + port + " as "
+                log.info("Trying to connect to nuxeo server at " + h + ':'
+                        + port + " as "
                         + (username == null ? "system user" : username) + "...");
                 client.connect(h, port);
                 setHost(h);

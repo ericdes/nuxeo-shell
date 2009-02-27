@@ -32,7 +32,7 @@ import org.nuxeo.ecm.shell.CommandLine;
  */
 public class ChangeDirCommand extends AbstractCommand {
     private static final Log log = LogFactory.getLog(ChangeDirCommand.class);
-    
+
     @Override
     public void run(CommandLine cmdLine) throws Exception {
         String[] elements = cmdLine.getParameters();

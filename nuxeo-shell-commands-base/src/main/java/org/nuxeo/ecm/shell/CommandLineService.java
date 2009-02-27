@@ -43,7 +43,7 @@ import org.osgi.framework.FrameworkListener;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- * 
+ *
  */
 public class CommandLineService extends DefaultComponent implements
         FrameworkListener {
@@ -211,21 +211,17 @@ public class CommandLineService extends DefaultComponent implements
             throws ParseException {
         Queue<CommandOption> queue = new LinkedList<CommandOption>();
         CommandLine cmdLine = new CommandLine(this);
-        if (args.length == 0) {
+        if (args == null || args.length == 0) {
             return cmdLine;
         }
-        // skip any option before command name - these may be used by the
-        // launcher
         int k = 0;
-        for (String arg : args) {
-            if (!arg.startsWith("-")) {
-                break;
-            } else {
-                k++;
-            }
-        }
-        // now parse the remaining arguments
-        cmdLine.addCommand(args[k]);
+        if (args[0].startsWith("-")) {// if no command specified then we use by default interactive mode
+            cmdLine.addCommand("interactive");
+        } else {
+            k =1;
+            cmdLine.addCommand(args[0]);  
+        }        
+        
         // if this is a dynamic script command we disable "validate" because
         // scripts may not declare the metadata() function that describe the
         // command
@@ -235,7 +231,7 @@ public class CommandLineService extends DefaultComponent implements
                 validate = false;
             }
         }
-        for (int i = k + 1; i < args.length; i++) {
+        for (int i = k; i < args.length; i++) {
             String arg = args[i];
             CommandOption opt;
             if (arg.startsWith("-")) {
