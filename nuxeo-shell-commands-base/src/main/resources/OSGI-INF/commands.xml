@@ -97,6 +97,27 @@
       <help>TODO</help>
     </command>
 
+    <command name="useradd" class="org.nuxeo.ecm.shell.commands.user.UserAddCommand">
+      <description>
+        Add a user, or a users list through a CSV file, in the members directory.
+      </description>
+      <options>
+        <option name="file" shortcut="f" var="true" type="file">
+          A path to an optional CSV file into which there are the users definitions
+        </option>
+        <option name="firstname" var="true"/>
+        <option name="lastname" var="true"/>
+        <option name="email" var="true"/>
+        <option name="company" var="true"/>
+      </options>
+      <params>
+        <param index="0" type="username_or_filename">
+        	The user name (identifier) or the CSV file name
+        </param>
+      </params>
+      <help>This is useful for populating the members directory</help>
+    </command>
+
     <command name="rm" class="org.nuxeo.ecm.shell.commands.repository.RmCommand">
       <description>
         Remove specified (or current) document
