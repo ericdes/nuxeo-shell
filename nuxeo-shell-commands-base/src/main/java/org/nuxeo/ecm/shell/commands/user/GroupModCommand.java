@@ -164,10 +164,12 @@ public class GroupModCommand extends AbstractCommand {
             return;
         }
         if (appendUsers) {
-            List<String> previousUserNames = (ArrayList<String>) entry.getProperty("group", "members");
+            List<String> previousUserNames = (ArrayList<String>) entry.getProperty(
+                    "group", "members");
             userNames.addAll(previousUserNames);
-        }        
+        }
         entry.setProperty("group", "members", userNames);
         directorySession.updateEntry(entry);
+        log.info("Group " + groupName + " updated successfully.");
     }
 }
