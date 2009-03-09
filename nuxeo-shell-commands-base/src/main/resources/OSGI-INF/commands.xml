@@ -106,7 +106,7 @@
         Add a user, or a users list through a CSV file, in the members directory.
       </description>
       <options>
-        <option name="file" shortcut="f" var="true" type="file">
+        <option name="file" var="true" type="file">
           A path to an optional CSV file into which there are the users definitions
         </option>
         <option name="firstname" var="true"/>
@@ -115,11 +115,36 @@
         <option name="company" var="true"/>
       </options>
       <params>
-        <param index="0" type="username_or_filename">
-        	The user name (identifier) or the CSV file name
+        <param index="0" type="username">
+        	The user name
         </param>
       </params>
       <help>This is useful for populating the members directory</help>
+    </command>
+
+    <command name="groupmod" class="org.nuxeo.ecm.shell.commands.user.GroupModCommand">
+      <description>
+        Add or set a user, or a users list through a CSV file, to an existing group.
+      </description>
+      <options>
+        <option name="user" var="true">
+          The name of the user to add or to set for this group
+        </option>
+        <option name="file" var="true" type="file">
+          A path to an optional CSV file into which there are the users names
+        </option>
+        <option name="set" type="boolean">
+          Use this option to set the users of a group, instead of the default "append" behavior. 
+        </option>
+      </options>
+      <params>
+        <param index="0" type="groupname">
+        	The name of the group to modify 
+        </param>
+      </params>
+      <help>
+        The default behavior of this command is to add users to a group.
+      </help>
     </command>
 
     <command name="rm" class="org.nuxeo.ecm.shell.commands.repository.RmCommand">
