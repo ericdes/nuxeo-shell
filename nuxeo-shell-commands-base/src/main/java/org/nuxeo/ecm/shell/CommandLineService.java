@@ -43,7 +43,7 @@ import org.osgi.framework.FrameworkListener;
 
 /**
  * @author <a href="mailto:bs@nuxeo.com">Bogdan Stefanescu</a>
- *
+ * 
  */
 public class CommandLineService extends DefaultComponent implements
         FrameworkListener {
@@ -207,6 +207,13 @@ public class CommandLineService extends DefaultComponent implements
         return commandContext;
     }
 
+    /**
+     * @param args the arguments as passed on the command line by a user
+     * @param validate specifies whether errors in parsing or in the passed
+     *            arguments and options should throw ParseException
+     * @return a CommandLine initialized object
+     * @throws ParseException
+     */
     public CommandLine parse(String[] args, boolean validate)
             throws ParseException {
         Queue<CommandOption> queue = new LinkedList<CommandOption>();
@@ -215,14 +222,15 @@ public class CommandLineService extends DefaultComponent implements
             return cmdLine;
         }
         int k = 0;
-        if (args[0].startsWith("-")) {// if no command specified then we use by default interactive mode
+        if (args[0].startsWith("-")) {
+            // If no command specified then we use by default interactive mode
             cmdLine.addCommand("interactive");
         } else {
-            k =1;
-            cmdLine.addCommand(args[0]);  
-        }        
-        
-        // if this is a dynamic script command we disable "validate" because
+            k = 1;
+            cmdLine.addCommand(args[0]);
+        }
+
+        // If this is a dynamic script command we disable "validate" because
         // scripts may not declare the metadata() function that describe the
         // command
         if (validate) {
