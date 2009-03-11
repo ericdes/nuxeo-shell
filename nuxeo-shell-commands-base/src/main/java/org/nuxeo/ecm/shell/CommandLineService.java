@@ -208,7 +208,9 @@ public class CommandLineService extends DefaultComponent implements
     }
 
     /**
-     * @param args the arguments as passed on the command line by a user
+     * @param args the arguments as passed on the command line by a user, the
+     *            first argument needs to be a command, if none is found the
+     *            "interactive" command is assumed.
      * @param validate specifies whether errors in parsing or in the passed
      *            arguments and options should throw ParseException
      * @return a CommandLine initialized object
@@ -222,6 +224,8 @@ public class CommandLineService extends DefaultComponent implements
             return cmdLine;
         }
         int k = 0;
+        // TODO: The need for the first argument to be a command should be
+        // removed and the parsing should be improved to that end.
         if (args[0].startsWith("-")) {
             // If no command specified then we use by default interactive mode
             cmdLine.addCommand("interactive");
