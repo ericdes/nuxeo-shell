@@ -207,6 +207,13 @@ public class CommandLineService extends DefaultComponent implements
         return commandContext;
     }
 
+    /**
+     * @param args the arguments as passed on the command line by a user
+     * @param validate specifies whether errors in parsing or in the passed
+     *            arguments and options should throw ParseException
+     * @return a CommandLine initialized object
+     * @throws ParseException
+     */
     public CommandLine parse(String[] args, boolean validate)
             throws ParseException {
         Queue<CommandOption> queue = new LinkedList<CommandOption>();
