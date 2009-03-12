@@ -115,7 +115,7 @@
               <!--format>directory</format-->
               <format>zip</format>
               <outputDirectory>target</outputDirectory>
-              <targetFile>nuxeo-client</targetFile>
+              <targetFile>nuxeo-shell</targetFile>
               <descriptor>
                 ${basedir}/src/main/assemble/assembly.xml
               </descriptor>
@@ -128,9 +128,8 @@
               <goal>attach</goal>
             </goals>
             <configuration>
-              <file>${basedir}/target/nuxeo-client.zip</file>
+              <file>${basedir}/target/nuxeo-shell.zip</file>
               <type>zip</type>
-              <classifier>template</classifier>
             </configuration>
           </execution>
         </executions>
