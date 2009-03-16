@@ -75,7 +75,7 @@ public class Main {
         }
         cmdContext.setUsername(cmdLine.getOption(Options.USERNAME));
         cmdContext.setPassword(cmdLine.getOption(Options.PASSWORD));
-        
+
         boolean debugMode = cmdLine.getOption(Options.DEBUG)!=null;
         if (debugMode) {
             LogCommand.setDebug(true);

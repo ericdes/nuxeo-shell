@@ -144,7 +144,7 @@ public class InteractiveCommand implements Command {
 
     /**
      * For now only command auto-completion is available.
-     * 
+     *
      * @param sb
      */
     void autoComplete(StringBuilder sb) {
