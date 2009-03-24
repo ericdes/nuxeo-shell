@@ -73,11 +73,6 @@
       </dependency>
 
       <dependency>
-        <groupId>jline</groupId>
-        <artifactId>jline</artifactId>
-        <version>0.9.94</version>
-      </dependency>
-      <dependency>
         <groupId>net.sf.opencsv</groupId>
         <artifactId>opencsv</artifactId>
         <version>1.7</version>
