@@ -42,7 +42,7 @@ public class InteractiveCommand implements Command {
 
     private static final Log log = LogFactory.getLog(InteractiveCommand.class);
 
-    private static enum CommandLineReturn {
+    private enum CommandLineReturn {
         SUCCESS, FAILURE, QUIT,
     }
 

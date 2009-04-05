@@ -153,9 +153,9 @@ public class RepoStatsCommand extends AbstractCommand {
 
     protected class StatTask implements Runnable {
 
-        private CoreSession session;
+        private final CoreSession session;
 
-        private DocumentModel rootDoc;
+        private final DocumentModel rootDoc;
 
         protected StatTask(DocumentModel rootDoc) throws Exception {
             session = NuxeoClient.getInstance().openRepository();

@@ -37,6 +37,7 @@ import org.nuxeo.ecm.shell.CommandLine;
 import org.nuxeo.ecm.shell.commands.repository.AbstractCommand;
 
 public class LogCommand extends AbstractCommand {
+
     private static final String CONSOLE_APPENDER_NAME = "CONSOLE";
 
     private static final String DEFAULT_CATEGORY = "org.nuxeo.ecm.shell";
@@ -45,9 +46,9 @@ public class LogCommand extends AbstractCommand {
 
     private static boolean debug = false;
 
-    private static String FULL_PATTERN_LAYOUT = "%d{HH:mm:ss,SSS} %-5p [%C{1}] %m%n";
+    private static final String FULL_PATTERN_LAYOUT = "%d{HH:mm:ss,SSS} %-5p [%C{1}] %m%n";
 
-    private static String LIGHT_PATTERN_LAYOUT = "%m%n";
+    private static final String LIGHT_PATTERN_LAYOUT = "%m%n";
 
     private void printHelp() {
         System.out.println("");

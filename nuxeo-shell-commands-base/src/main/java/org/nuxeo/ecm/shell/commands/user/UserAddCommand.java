@@ -29,7 +29,6 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.directory.Session;
 import org.nuxeo.ecm.directory.api.DirectoryService;
@@ -43,7 +42,6 @@ import au.com.bytecode.opencsv.CSVReader;
  * @author M.-A. Darche
  */
 public class UserAddCommand extends AbstractCommand {
-    private static final Log log = LogFactory.getLog(UserAddCommand.class);
 
     public static final String COMMAND_NAME = "useradd";
 
@@ -54,6 +52,9 @@ public class UserAddCommand extends AbstractCommand {
 
     public static final String USER_DIRECTORY_NAME = "userDirectory";
 
+    private static final Log log = LogFactory.getLog(UserAddCommand.class);
+
+    @Override
     public void run(CommandLine cmdLine) throws Exception {
         // Parsing the command line
         String[] elements = cmdLine.getParameters();
@@ -168,4 +169,5 @@ public class UserAddCommand extends AbstractCommand {
         log.info("User " + userFields.get("username")
                 + " created successfully.");
     }
+
 }

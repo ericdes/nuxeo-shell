@@ -23,14 +23,11 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Collections;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.nuxeo.ecm.core.api.CoreSession;
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.repository.RepositoryInstance;
 import org.nuxeo.ecm.directory.Session;
@@ -58,6 +55,7 @@ public class GroupModCommand extends AbstractCommand {
                 + COMMAND_NAME + " --user username groupname");
     }
 
+    @Override
     public void run(CommandLine cmdLine) throws Exception {
         // Parsing the command line
         String[] elements = cmdLine.getParameters();
@@ -154,6 +152,7 @@ public class GroupModCommand extends AbstractCommand {
         modifyGroup(userNames, appendUsers, groupName, directorySession);
     }
 
+    @SuppressWarnings("unchecked")
     private void modifyGroup(List<String> userNames, boolean appendUsers,
             String groupName, Session directorySession) throws Exception {
         DocumentModel entry = directorySession.getEntry(groupName);
