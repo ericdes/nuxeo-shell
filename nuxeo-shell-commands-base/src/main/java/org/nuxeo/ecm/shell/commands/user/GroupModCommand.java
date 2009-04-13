@@ -70,8 +70,7 @@ public class GroupModCommand extends AbstractCommand {
         boolean importThroughCsv = false;
         File csvFile = null;
         String userName = null;
-        String optionName = null;
-        optionName = "file";
+        String optionName = "file";
         if (cmdLine.isOptionSet(optionName)) {
             String csvFileName = cmdLine.getOption(optionName);
             log.debug("Reading user definitions of CSV file " + csvFileName);
@@ -122,8 +121,7 @@ public class GroupModCommand extends AbstractCommand {
 
     private void importCsvFile(File file, boolean appendUsers,
             String groupName, Session directorySession) throws Exception {
-        CSVReader csvReader = null;
-        csvReader = new CSVReader(new FileReader(file));
+        CSVReader csvReader = new CSVReader(new FileReader(file));
         List<String> userNames = new ArrayList<String>();
 
         String[] nextLine;
@@ -163,7 +161,7 @@ public class GroupModCommand extends AbstractCommand {
             return;
         }
         if (appendUsers) {
-            List<String> previousUserNames = (ArrayList<String>) entry.getProperty(
+            List<String> previousUserNames = (List<String>) entry.getProperty(
                     "group", "members");
             userNames.addAll(previousUserNames);
         }
@@ -171,4 +169,5 @@ public class GroupModCommand extends AbstractCommand {
         directorySession.updateEntry(entry);
         log.info("Group " + groupName + " updated successfully.");
     }
+
 }
