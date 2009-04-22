@@ -21,6 +21,7 @@ package org.nuxeo.ecm.shell.commands;
 
 import java.io.File;
 import java.io.PrintStream;
+import java.text.ParseException;
 
 import jline.ConsoleReader;
 import jline.History;
@@ -115,6 +116,10 @@ public class InteractiveCommand implements Command {
             }
             runCommand(cmdLine);
         } catch (UnknownCommandException e) {
+            return CommandLineReturn.FAILURE;
+        } catch (ParseException e) {
+            log.error("Command failed. "+ e.getMessage());
+            log.debug(e.getStackTrace());
             return CommandLineReturn.FAILURE;
         } catch (Throwable e) {
             log.error("Command failed.", e);
