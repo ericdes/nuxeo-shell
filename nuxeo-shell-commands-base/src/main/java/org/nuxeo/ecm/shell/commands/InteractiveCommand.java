@@ -119,7 +119,7 @@ public class InteractiveCommand implements Command {
             return CommandLineReturn.FAILURE;
         } catch (ParseException e) {
             log.error("Command failed. "+ e.getMessage());
-            log.debug(e.getStackTrace());
+            log.debug(e);
             return CommandLineReturn.FAILURE;
         } catch (Throwable e) {
             log.error("Command failed.", e);
