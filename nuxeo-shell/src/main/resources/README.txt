@@ -1,11 +1,29 @@
-To launch the 'ls' command:
-./nxclient.sh ls -h localhost
+Use nxclient.sh or nxshell.sh
+'./nxshell.sh' is equivalent to './nxclient.sh interactive'
 
-To launch the interactive console:
-./nxclient.sh -console -h localhost
+Usage:
+    ./nxclient.sh [-dev] [-h server_ip] [-d]
+    ./nxclient.sh [-clear] [-console] [-h server_ip] [-d]
+    ./nxclient.sh [-clear] [command] [-h server_ip] [-d]
+    ./nxclient.sh [-dev] [-clear] [-console] [command] [-h server_ip] [-d]
+    ./nxshell.sh [-h server_ip] [-d]
 
-to launch in development mode: (this is equivalent to -clear -console and starts debug server on port 8788)
-./nxclient.sh -dev -h localhost
+Options:
+    -dev
+        Developer mode (JVM listening for transport dt_socket at address: 8788).
+        Equivalent to -clear -console and starting debug server on port 8788.
+    -clear
+        Clear classpath cache
+    -console
+        Console mode. Incompatible with use of command in command-line.
+    command
+        Any valid Nuxeo Shell command (such as 'ls', '--script file.js', ...).
+        See http://doc.nuxeo.org/5.1/books/nuxeo-book/html/nuxeo-shell.html
+        Cannot be used with console mode.
+    -h server_ip
+        Connect on Nuxeo Core listening on server_ip. Use at least '-h localhost'.
+    -d
+        Debug mode. Logging switched from INFO to DEBUG.
+        See 'log' command for more options about logging.
 
-'./nxclient.sh -console' is equivalent to './nxshell.sh'
-
+For Windows users, nxclient.cmd is quite equivalent to nxclient.sh
